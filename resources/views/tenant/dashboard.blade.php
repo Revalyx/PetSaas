@@ -24,6 +24,12 @@
             <p class="text-5xl font-bold mt-1">—</p>
         </div>
 
+        <a href="{{ route('tenant.clientes.index') }}"
+   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+   Gestionar Clientes
+</a>
+
+
     </div>
 
 

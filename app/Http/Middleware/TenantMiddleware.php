@@ -25,7 +25,7 @@ class TenantMiddleware
         }
 
         // ========================================================
-        // 2) Usuario no autenticado → seguir normal (irá a login)
+        // 2) Usuario no autenticado → no se puede cargar tenant
         // ========================================================
         if (!Auth::check()) {
             return $next($request);
@@ -34,14 +34,14 @@ class TenantMiddleware
         $user = Auth::user();
 
         // ========================================================
-        // 3) Superadmin → NO se fuerza tenant
+        // 3) Si el usuario NO tiene tenant_id → es superadmin
         // ========================================================
         if ($user->tenant_id === null) {
             return $next($request);
         }
 
         // ========================================================
-        // 4) Cargar información del tenant
+        // 4) Buscar BD del tenant
         // ========================================================
         $tenant = Tenant::find($user->tenant_id);
 
@@ -50,7 +50,7 @@ class TenantMiddleware
         }
 
         // ========================================================
-        // 5) Configurar conexión dinámica para el tenant
+        // 5) Configurar conexión dinámica tenant
         // ========================================================
         config([
             'database.connections.tenant.host'     => $tenant->db_host,
@@ -59,19 +59,19 @@ class TenantMiddleware
             'database.connections.tenant.password' => decrypt($tenant->db_password),
         ]);
 
-        DB::purge('tenant'); // Limpia cualquier conexión previa
-        DB::setDefaultConnection('tenant'); // La conexión por defecto será tenant
+        DB::purge('tenant');               // Limpia caché de conexiones
+        DB::setDefaultConnection('tenant'); // Marca tenant como conexión por defecto
 
-        // Guardamos el tenant actual en el request para debug
+        // Para debugging opcional
         $request->tenant = $tenant;
 
         // ========================================================
-        // 6) Ejecutamos la request ya bajo tenant
+        // 6) Procesamos la request bajo la BD tenant
         // ========================================================
         $response = $next($request);
 
         // ========================================================
-        // 7) Restaurar conexión a MySQL por seguridad
+        // 7) Restauramos conexión principal por seguridad
         // ========================================================
         DB::setDefaultConnection(config('database.default'));
 

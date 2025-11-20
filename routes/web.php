@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\Tenant\DashboardController;
+use App\Http\Controllers\Tenant\ClienteController;
 
 
 // ========================================
@@ -15,7 +16,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 // ========================================
-// HOME PÚBLICA
+// HOME PUBLICA
 // ========================================
 Route::get('/', function () {
     return 'Página pública. Ve a /login';
@@ -37,26 +38,25 @@ Route::get('/debug-db', function () {
 // ========================================
 // PANEL DEL JEFE (TENANT)
 // ========================================
-// Middleware: primero auth → luego tenant (carga DB dinámica)
+// Middleware: auth → tenant (carga BD dinámica)
 Route::middleware(['auth', 'tenant'])
+    ->prefix('tenant')
     ->name('tenant.')
     ->group(function () {
 
     // Dashboard del tenant
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
-});
 
+    // CRUD de clientes
+    Route::get('/clientes', [ClienteController::class, 'index'])
+        ->name('clientes.index');
 
-// ========================================
-// PRUEBA DE TABLAS EN TENANT
-// ========================================
-Route::get('/tenant-test', function () {
-    try {
-        return \DB::connection('tenant')->select('SELECT * FROM pruebas');
-    } catch (\Exception $e) {
-        return 'ERROR: ' . $e->getMessage();
-    }
+    Route::get('/clientes/crear', [ClienteController::class, 'create'])
+        ->name('clientes.create');
+
+    Route::post('/clientes', [ClienteController::class, 'store'])
+        ->name('clientes.store');
 });
 
 

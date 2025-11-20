@@ -55,61 +55,63 @@ class SuperAdminController extends Controller
      * ====================================================
      */
     public function storeTenant(Request $request)
-    {
-        $request->validate([
-            'empresa' => 'required|string|max:255',
-            'slug'    => 'required|string|max:255|unique:tenants,slug',
-        ]);
+{
+    $request->validate([
+        'empresa' => 'required|string|max:255',
+        'slug'    => 'required|string|max:255|unique:tenants,slug',
+    ]);
 
-        $slug   = $request->slug;
-        $dbName = $slug;
+    $slug   = $request->slug;
+    $dbName = $slug;
 
-        /**
-         * 1️⃣ Crear base de datos física
-         */
-        DB::statement("CREATE DATABASE `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    /**
+     * 1️⃣ Crear base de datos física
+     */
+    DB::statement("CREATE DATABASE `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
-        /**
-         * 2️⃣ Registrar tenant en petsaas_core
-         */
-        $tenant = Tenant::create([
-            'name'        => $request->empresa,
-            'slug'        => $slug,
-            'db_name'     => $dbName,
-            'db_host'     => env('DB_HOST'),
-            'db_username' => env('DB_USERNAME'),
-            'db_password' => encrypt(env('DB_PASSWORD')),
-        ]);
+    /**
+     * 2️⃣ Registrar tenant en petsaas_core
+     */
+    $tenant = Tenant::create([
+        'name'        => $request->empresa,
+        'slug'        => $slug,
+        'db_name'     => $dbName,
+        'db_host'     => env('DB_HOST'),
+        'db_username' => env('DB_USERNAME'),
+        'db_password' => encrypt(env('DB_PASSWORD')),
+    ]);
 
-        /**
-         * 3️⃣ Configurar conexión dinámica
-         */
-        config([
-            'database.connections.tenant.host'     => $tenant->db_host,
-            'database.connections.tenant.database' => $tenant->db_name,
-            'database.connections.tenant.username' => $tenant->db_username,
-            'database.connections.tenant.password' => decrypt($tenant->db_password),
-        ]);
+    /**
+     * 3️⃣ Configurar conexión dinámica del tenant
+     */
+    config([
+        'database.connections.tenant.host'     => $tenant->db_host,
+        'database.connections.tenant.database' => $tenant->db_name,
+        'database.connections.tenant.username' => $tenant->db_username,
+        'database.connections.tenant.password' => decrypt($tenant->db_password),
+    ]);
 
-        DB::purge('tenant');
+    DB::purge('tenant'); // limpiar caché y forzar nueva conexión
 
-        /**
-         * 4️⃣ Crear tabla users en la BD del tenant
-         */
-        DB::connection('tenant')->statement("
-            CREATE TABLE users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255),
-                email VARCHAR(255),
-                password VARCHAR(255),
-                created_at TIMESTAMP NULL,
-                updated_at TIMESTAMP NULL
-            )
-        ");
+    /**
+     * 4️⃣ Ejecutar todas las migraciones del tenant
+     * Esto crea automáticamente:
+     *  - users
+     *  - clientes
+     *  - mascotas (si las añade)
+     *  - citas (si las añade)
+     *  - tabla migrations
+     */
+    \Artisan::call('migrate', [
+        '--database' => 'tenant',
+        '--path'     => 'database/migrations',
+        '--force'    => true
+    ]);
 
-        return redirect()->route('superadmin.dashboard')
-            ->with('success', 'Empresa creada con éxito.');
-    }
+    return redirect()->route('superadmin.dashboard')
+        ->with('success', 'Empresa creada con éxito.');
+}
+
 
 
     /**
