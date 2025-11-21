@@ -18,4 +18,10 @@ class Cliente extends Model
         'direccion',
         'notas',
     ];
+
+    public function mascotas()
+{
+    return $this->hasMany(\App\Models\Mascota::class);
+}
+
 }

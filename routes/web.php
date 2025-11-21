@@ -5,27 +5,25 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\ClienteController;
+use App\Http\Controllers\Tenant\MascotaController;
 
-
-// ========================================
+// ========================================================
 // LOGIN + LOGOUT
-// ========================================
+// ========================================================
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-// ========================================
+// ========================================================
 // HOME PUBLICA
-// ========================================
+// ========================================================
 Route::get('/', function () {
     return 'Página pública. Ve a /login';
 });
 
-
-// ========================================
+// ========================================================
 // DEBUG
-// ========================================
+// ========================================================
 Route::get('/debug-db', function () {
     return [
         'user'      => auth()->user(),
@@ -34,69 +32,101 @@ Route::get('/debug-db', function () {
     ];
 });
 
-
-// ========================================
-// PANEL DEL JEFE (TENANT)
-// ========================================
-// Middleware: auth → tenant (carga BD dinámica)
+// ========================================================
+// PANEL DEL TENANT (JEFE)
+// Middleware: auth → tenant
+// ========================================================
 Route::middleware(['auth', 'tenant'])
     ->prefix('tenant')
     ->name('tenant.')
     ->group(function () {
 
-    // Dashboard del tenant
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+        // -------------------------------
+        // DASHBOARD
+        // -------------------------------
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
 
-    // CRUD de clientes
-    Route::get('/clientes', [ClienteController::class, 'index'])
-        ->name('clientes.index');
+        // -------------------------------
+        // CLIENTES CRUD
+        // -------------------------------
+        Route::get('/clientes', [ClienteController::class, 'index'])
+            ->name('clientes.index');
 
-    Route::get('/clientes/crear', [ClienteController::class, 'create'])
-        ->name('clientes.create');
+        Route::get('/clientes/crear', [ClienteController::class, 'create'])
+            ->name('clientes.create');
 
-    Route::post('/clientes', [ClienteController::class, 'store'])
-        ->name('clientes.store');
+        Route::post('/clientes', [ClienteController::class, 'store'])
+            ->name('clientes.store');
+
+        // -------------------------------
+        // MASCOTAS CRUD COMPLETO
+        // -------------------------------
+        Route::get('/mascotas', [MascotaController::class, 'index'])
+            ->name('mascotas.index');
+
+        Route::get('/mascotas/crear', [MascotaController::class, 'create'])
+            ->name('mascotas.create');
+
+        Route::post('/mascotas', [MascotaController::class, 'store'])
+            ->name('mascotas.store');
+
+        Route::get('/mascotas/{id}/editar', [MascotaController::class, 'edit'])
+            ->name('mascotas.edit');
+
+        Route::put('/mascotas/{id}', [MascotaController::class, 'update'])
+            ->name('mascotas.update');
+
+        Route::delete('/mascotas/{id}', [MascotaController::class, 'destroy'])
+            ->name('mascotas.destroy');
 });
 
-
-// ========================================
-// SUPERADMIN - HEALTH
-// ========================================
+// ========================================================
+// SUPERADMIN - HEALTH CHECK
+// ========================================================
 Route::get('/superadmin/health', [SuperAdminController::class, 'systemHealth'])
     ->middleware(['auth', 'superadmin'])
     ->name('superadmin.health');
 
-
-// ========================================
-// SUPERADMIN
-// ========================================
+// ========================================================
+// SUPERADMIN PANEL
+// ========================================================
 Route::middleware(['auth', 'superadmin'])
     ->prefix('superadmin')
     ->name('superadmin.')
     ->group(function () {
 
-    // Dashboard Superadmin
-    Route::get('/dashboard', [SuperAdminController::class, 'index'])
-        ->name('dashboard');
+        // Dashboard
+        Route::get('/dashboard', [SuperAdminController::class, 'index'])
+            ->name('dashboard');
 
-    // CRUD Tenants
-    Route::get('/tenants', [SuperAdminController::class, 'tenants'])
-        ->name('tenants.index');
+        // TENANTS CRUD
+        Route::get('/tenants', [SuperAdminController::class, 'tenants'])
+            ->name('tenants.index');
 
-    Route::get('/tenants/create', [SuperAdminController::class, 'createTenant'])
-        ->name('tenants.create');
+        Route::get('/tenants/create', [SuperAdminController::class, 'createTenant'])
+            ->name('tenants.create');
 
-    Route::post('/tenants/store', [SuperAdminController::class, 'storeTenant'])
-        ->name('tenants.store');
+        Route::post('/tenants/store', [SuperAdminController::class, 'storeTenant'])
+            ->name('tenants.store');
 
-    Route::delete('/tenants/{id}', [SuperAdminController::class, 'destroy'])
-        ->name('tenants.destroy');
+        Route::delete('/tenants/{id}', [SuperAdminController::class, 'destroy'])
+            ->name('tenants.destroy');
 
-    // CRUD Usuarios de empresa
-    Route::get('/users/create', [SuperAdminController::class, 'createUser'])
-        ->name('users.create');
+        // USERS CRUD
+        Route::get('/users/create', [SuperAdminController::class, 'createUser'])
+            ->name('users.create');
 
-    Route::post('/users/store', [SuperAdminController::class, 'storeUser'])
-        ->name('users.store');
+        Route::post('/users/store', [SuperAdminController::class, 'storeUser'])
+            ->name('users.store');
+
+        // Ejecutar migraciones del tenant actual
+        Route::get('/run-tenant-migrations', function () {
+            \Artisan::call('migrate', [
+                '--database' => 'tenant',
+                '--force'    => true
+            ]);
+
+            return "Migraciones ejecutadas en este tenant.";
+        })->middleware(['auth', 'tenant']);
 });
