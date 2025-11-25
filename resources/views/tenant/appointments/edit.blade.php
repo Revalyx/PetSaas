@@ -9,16 +9,16 @@
 
     <div class="bg-gray-900/30 dark:bg-gray-800/40 p-8 rounded-xl shadow-xl w-full max-w-3xl">
 
-        <h2 class="text-2xl font-bold mb-6 text-center">Editar cita</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center text-white">Editar cita</h2>
 
         {{-- DATOS ACTUALES --}}
         <div class="bg-gray-800/50 text-gray-200 p-4 rounded-lg mb-6">
 
-            <p><strong>Cliente:</strong> 
+            <p><strong>Cliente:</strong>
                 {{ $appointment->customer?->nombre }} {{ $appointment->customer?->apellidos }}
             </p>
 
-            <p><strong>Mascota:</strong> 
+            <p><strong>Mascota:</strong>
                 {{ $appointment->pet?->nombre ?? '—' }}
             </p>
 
@@ -35,14 +35,16 @@
 
         </div>
 
-        <form method="POST" action="{{ route('tenant.appointments.update', $appointment->id) }}" class="grid grid-cols-2 gap-6">
+
+        <form method="POST" action="{{ route('tenant.appointments.update', $appointment->id) }}" class="space-y-6">
             @csrf
             @method('PUT')
 
             {{-- CLIENTE --}}
-            <div class="col-span-2">
-                <label class="font-semibold">Cliente</label>
-                <select name="customer_id" class="w-full bg-gray-700 rounded-lg px-3 py-2">
+            <div>
+                <label class="font-semibold text-white">Cliente</label>
+                <select name="customer_id"
+                        class="w-full bg-gray-700 rounded-lg px-3 py-2">
                     @foreach($customers as $c)
                         <option value="{{ $c->id }}" {{ $c->id == $appointment->customer_id ? 'selected' : '' }}>
                             {{ $c->nombre }} {{ $c->apellidos }}
@@ -52,8 +54,8 @@
             </div>
 
             {{-- MASCOTA --}}
-            <div class="col-span-2">
-                <label class="font-semibold">Mascota (opcional)</label>
+            <div>
+                <label class="font-semibold text-white">Mascota (opcional)</label>
                 <select name="pet_id" class="w-full bg-gray-700 rounded-lg px-3 py-2">
                     <option value="">Sin mascota</option>
                     @foreach($pets as $p)
@@ -64,9 +66,29 @@
                 </select>
             </div>
 
+            {{-- TIPO --}}
+            <div>
+                <label class="font-semibold text-white">Tipo de cita</label>
+                <select name="type" class="w-full bg-gray-700 rounded-lg px-3 py-2">
+                    <option value="muda"      {{ $appointment->type=='muda' ? 'selected' : '' }}>Muda</option>
+                    <option value="corte"     {{ $appointment->type=='corte' ? 'selected' : '' }}>Corte</option>
+                    <option value="arreglo"   {{ $appointment->type=='arreglo' ? 'selected' : '' }}>Arreglo</option>
+                    <option value="gato"      {{ $appointment->type=='gato' ? 'selected' : '' }}>Gato</option>
+                    <option value="cancelar"  {{ $appointment->type=='cancelar' ? 'selected' : '' }}>Cancelar</option>
+                </select>
+            </div>
+
+            {{-- DIFÍCIL --}}
+            <div class="flex items-center gap-2">
+                <input type="checkbox" name="is_difficult" value="1"
+                       {{ $appointment->is_difficult ? 'checked' : '' }}
+                       class="w-4 h-4 bg-gray-700 border-gray-500 rounded">
+                <label class="font-semibold text-white">Marcar como cita difícil</label>
+            </div>
+
             {{-- FECHA --}}
             <div>
-                <label class="font-semibold">Fecha</label>
+                <label class="font-semibold text-white">Fecha</label>
                 <input type="date" name="date"
                        value="{{ $appointment->date->format('Y-m-d') }}"
                        class="w-full bg-gray-700 rounded-lg px-3 py-2">
@@ -74,7 +96,7 @@
 
             {{-- HORA INICIO --}}
             <div>
-                <label class="font-semibold">Hora inicio</label>
+                <label class="font-semibold text-white">Hora inicio</label>
                 <input type="time" name="start_time"
                        value="{{ $appointment->start_time }}"
                        class="w-full bg-gray-700 rounded-lg px-3 py-2">
@@ -82,7 +104,7 @@
 
             {{-- HORA FIN --}}
             <div>
-                <label class="font-semibold">Hora fin</label>
+                <label class="font-semibold text-white">Hora fin</label>
                 <input type="time" name="end_time"
                        value="{{ $appointment->end_time }}"
                        class="w-full bg-gray-700 rounded-lg px-3 py-2">
@@ -90,9 +112,9 @@
 
             {{-- ESTADO --}}
             <div>
-                <label class="font-semibold">Estado</label>
+                <label class="font-semibold text-white">Estado</label>
                 <select name="status" class="w-full bg-gray-700 rounded-lg px-3 py-2">
-                    <option value="pending" {{ $appointment->status=='pending' ? 'selected' : '' }}>Pendiente</option>
+                    <option value="pending"   {{ $appointment->status=='pending' ? 'selected' : '' }}>Pendiente</option>
                     <option value="confirmed" {{ $appointment->status=='confirmed' ? 'selected' : '' }}>Confirmada</option>
                     <option value="cancelled" {{ $appointment->status=='cancelled' ? 'selected' : '' }}>Cancelada</option>
                     <option value="completed" {{ $appointment->status=='completed' ? 'selected' : '' }}>Completada</option>
@@ -100,15 +122,13 @@
             </div>
 
             {{-- NOTAS --}}
-            <div class="col-span-2">
-                <label class="font-semibold">Notas</label>
-                <textarea name="notes" rows="3" class="w-full bg-gray-700 rounded-lg px-3 py-2">
-                    {{ $appointment->notes }}
-                </textarea>
+            <div>
+                <label class="font-semibold text-white">Notas</label>
+                <textarea name="notes" rows="3" class="w-full bg-gray-700 rounded-lg px-3 py-2">{{ $appointment->notes }}</textarea>
             </div>
 
             {{-- BOTONES --}}
-            <div class="col-span-2 flex justify-end gap-3">
+            <div class="flex justify-end gap-3">
                 <a href="{{ route('tenant.appointments.index') }}"
                     class="px-4 py-2 bg-gray-600 text-white rounded-lg">Cancelar</a>
 

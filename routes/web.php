@@ -82,28 +82,32 @@ Route::middleware(['auth', 'tenant'])
             ->name('mascotas.destroy');
 
         // -------------------------------
-        // APPOINTMENTS (CITAS)
-        // -------------------------------
-        Route::prefix('appointments')->name('appointments.')->group(function () {
+// APPOINTMENTS (CITAS)
+// -------------------------------
+Route::prefix('appointments')->name('appointments.')->group(function () {
 
-            Route::get('/', [AppointmentController::class, 'index'])
-                ->name('index');
+    Route::get('/', [AppointmentController::class, 'index'])
+        ->name('index');
 
-            Route::get('/create', [AppointmentController::class, 'create'])
-                ->name('create');
+    Route::get('/create', [AppointmentController::class, 'create'])
+        ->name('create');
 
-            Route::post('/', [AppointmentController::class, 'store'])
-                ->name('store');
+    Route::post('/', [AppointmentController::class, 'store'])
+        ->name('store');
 
-            Route::get('/{id}/edit', [AppointmentController::class, 'edit'])
-                ->name('edit');
+    Route::get('/{id}/edit', [AppointmentController::class, 'edit'])
+        ->name('edit');
 
-            Route::put('/{id}', [AppointmentController::class, 'update'])
-                ->name('update');
+    // 🔥 RUTA CORRECTA PARA FULLCALENDAR
+    Route::get('/calendar/events', [AppointmentController::class, 'calendarEvents'])
+        ->name('calendar.events');
 
-            Route::delete('/{id}', [AppointmentController::class, 'destroy'])
-                ->name('destroy');
-        });
+    Route::put('/{id}', [AppointmentController::class, 'update'])
+        ->name('update');
+
+    Route::delete('/{id}', [AppointmentController::class, 'destroy'])
+        ->name('destroy');
+});
 
         // Calendario de citas
         Route::get('/appointments/calendar', [\App\Http\Controllers\AppointmentCalendarController::class, 'index'])

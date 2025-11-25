@@ -6,7 +6,6 @@ use App\Models\Cliente;
 use App\Models\Mascota;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
@@ -21,26 +20,27 @@ class AppointmentController extends Controller
         return view('tenant.appointments.index', compact('appointments'));
     }
 
-    /** FORMULARIO DE CREAR */
+    /** FORMULARIO CREAR */
     public function create(Request $request)
-{
-    $customers = Cliente::orderBy('nombre')->get();
-    $pets = Mascota::orderBy('nombre')->get();
-    $prefillDate = $request->query('date', null); // YYYY-MM-DD or null
+    {
+        $customers = Cliente::orderBy('nombre')->get();
+        $pets = Mascota::orderBy('nombre')->get();
+        $prefillDate = $request->query('date', null);
 
-    return view('tenant.appointments.create', compact('customers', 'pets', 'prefillDate'));
-}
-
+        return view('tenant.appointments.create',
+            compact('customers', 'pets', 'prefillDate')
+        );
+    }
 
     /** GUARDAR */
     public function store(Request $request)
     {
         $request->validate([
-            'customer_id' => 'required|integer',
+            'customer_id' => 'required',
             'date'        => 'required|date',
             'start_time'  => 'required',
-            'end_time'    => 'nullable',
-            'status'      => 'required',
+            'type'        => 'required',
+            'status'      => 'required'
         ]);
 
         Appointment::create([
@@ -50,21 +50,24 @@ class AppointmentController extends Controller
             'start_time'  => $request->start_time,
             'end_time'    => $request->end_time ?: null,
             'notes'       => $request->notes,
-            'status'      => $request->status,
+            'type'        => $request->type,      // muda, corte, arreglo, gato
+            'status'      => $request->status,    // pending, confirmed, cancelled, completed
+            'is_difficult'=> $request->has('is_difficult'),
         ]);
 
         return redirect()->route('tenant.appointments.index');
     }
 
-    /** FORMULARIO DE EDITAR */
+    /** FORMULARIO EDITAR */
     public function edit($id)
     {
         $appointment = Appointment::with(['customer', 'pet'])->findOrFail($id);
+        $customers   = Cliente::orderBy('nombre')->get();
+        $pets        = Mascota::orderBy('nombre')->get();
 
-        $customers = Cliente::orderBy('nombre')->get();
-        $pets      = Mascota::orderBy('nombre')->get();
-
-        return view('tenant.appointments.edit', compact('appointment', 'customers', 'pets'));
+        return view('tenant.appointments.edit',
+            compact('appointment', 'customers', 'pets')
+        );
     }
 
     /** ACTUALIZAR */
@@ -76,6 +79,7 @@ class AppointmentController extends Controller
             'customer_id' => 'required',
             'date'        => 'required',
             'start_time'  => 'required',
+            'type'        => 'required',
             'status'      => 'required'
         ]);
 
@@ -86,7 +90,9 @@ class AppointmentController extends Controller
             'start_time'  => $request->start_time,
             'end_time'    => $request->end_time ?: null,
             'notes'       => $request->notes,
+            'type'        => $request->type,
             'status'      => $request->status,
+            'is_difficult'=> $request->has('is_difficult'),
         ]);
 
         return redirect()->route('tenant.appointments.index');
@@ -98,4 +104,51 @@ class AppointmentController extends Controller
         Appointment::findOrFail($id)->delete();
         return redirect()->route('tenant.appointments.index');
     }
+
+    /** EVENTOS PARA FULLCALENDAR */
+   public function calendarEvents()
+{
+    $appointments = Appointment::with(['customer', 'pet'])->get();
+
+    $events = $appointments->map(function ($a) {
+
+        // Asegurar formato correcto (YYYY-MM-DD)
+        $date = substr($a->date, 0, 10);
+
+        $start = $date . 'T' . $a->start_time;
+        $end   = $a->end_time ? ($date . 'T' . $a->end_time) : null;
+
+        // PRIORIDAD FINAL:
+//
+// 1) CANCELADA → azul
+// 2) DIFÍCIL → gris
+// 3) TIPO NORMAL
+if ($a->status === 'cancelled') {
+    $finalType = 'cancelled';
+}
+elseif ($a->is_difficult) {
+    $finalType = 'dificiles';
+}
+else {
+    $finalType = $a->type;
+}
+
+
+        return [
+            'id'    => $a->id,
+            'title' => ($a->pet->nombre ?? 'Mascota') . ' — ' . ($a->customer->nombre ?? 'Cliente'),
+            'start' => $start,
+            'end'   => $end,
+            'extendedProps' => [
+                'customer' => $a->customer->nombre ?? null,
+                'pet'      => $a->pet->nombre ?? null,
+                'notes'    => $a->notes,
+                'type'     => $finalType,
+            ],
+        ];
+    });
+
+    return response()->json($events);
+}
+
 }
