@@ -6,6 +6,7 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\ClienteController;
 use App\Http\Controllers\Tenant\MascotaController;
+use App\Http\Controllers\AppointmentController;
 
 // ========================================================
 // LOGIN + LOGOUT
@@ -79,6 +80,38 @@ Route::middleware(['auth', 'tenant'])
 
         Route::delete('/mascotas/{id}', [MascotaController::class, 'destroy'])
             ->name('mascotas.destroy');
+
+        // -------------------------------
+        // APPOINTMENTS (CITAS)
+        // -------------------------------
+        Route::prefix('appointments')->name('appointments.')->group(function () {
+
+            Route::get('/', [AppointmentController::class, 'index'])
+                ->name('index');
+
+            Route::get('/create', [AppointmentController::class, 'create'])
+                ->name('create');
+
+            Route::post('/', [AppointmentController::class, 'store'])
+                ->name('store');
+
+            Route::get('/{id}/edit', [AppointmentController::class, 'edit'])
+                ->name('edit');
+
+            Route::put('/{id}', [AppointmentController::class, 'update'])
+                ->name('update');
+
+            Route::delete('/{id}', [AppointmentController::class, 'destroy'])
+                ->name('destroy');
+        });
+
+        // Calendario de citas
+        Route::get('/appointments/calendar', [\App\Http\Controllers\AppointmentCalendarController::class, 'index'])
+            ->name('appointments.calendar');
+
+        Route::get('/appointments/calendar-events', [\App\Http\Controllers\AppointmentCalendarController::class, 'events'])
+            ->name('appointments.calendar.events');
+
 });
 
 // ========================================================
