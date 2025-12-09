@@ -86,7 +86,7 @@
                                    focus:border-orange-500 dark:text-white transition"
                             placeholder="usuario@empresa.com">
                         <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400 dark:text-gray-300" 
-                             xmlns="http://www.w3.org/2000/svg" fill="none" 
+                             xmlns="https://www.w3.org/2000/svg" fill="none" 
                              viewBox="0 0 24 24" stroke="currentColor">
                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                              d="M16.5 12c0 1.657-1.343 3-3 3h-3a3 3 0 010-6h3c1.657 0 3 1.343 3 3zm-5.25 0h.008v.008h-.008V12zm0 0h.008v.008h-.008V12z" />

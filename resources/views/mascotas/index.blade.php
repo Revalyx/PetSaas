@@ -39,7 +39,7 @@
                         {{-- Botón Editar --}}
                         <a href="{{ route('tenant.mascotas.edit', $m->id) }}"
                            class="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                            <svg xmlns="https://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 4h10M11 4v10M11 4L4 11m7-7l7 7" />
@@ -54,7 +54,7 @@
                             @method('DELETE')
 
                             <button class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                <svg xmlns="https://www.w3.org/2000/svg" class="h-4 w-4"
                                      viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
                                         d="M9 2a1 1 0 00-.894.553L7.382 4H3a1 1 0 000 2h1v10a2 2 0 002 2h8a2 2 0 002-2V6h1a1 1 0 100-2h-4.382l-.724-1.447A1 1 0 0011 2H9zm3 6a1 1 0 10-2 0v6a1 1 0 102 0V8zM9 8a1 1 0 10-2 0v6a1 1 0 102 0V8z"
