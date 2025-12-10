@@ -13,18 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         // ======================================================
-        // ALIASES DE MIDDLEWARE PERSONALIZADOS
+        // ALIASES REALES EN LARAVEL 12
         // ======================================================
         $middleware->alias([
-            'tenant'     => \App\Http\Middleware\TenantMiddleware::class,
-            'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
-        ]);
-
-        // SI QUIERES *OBLIGAR* tenant a afectar TODO el web stack:
-        // (no recomendable)
-        // $middleware->web([
-        //     \App\Http\Middleware\TenantMiddleware::class,
-        // ]);
+    'auth'       => \Illuminate\Auth\Middleware\Authenticate::class,
+    'tenant'     => \App\Http\Middleware\TenantMiddleware::class,
+    'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+]);
 
     })
     ->withExceptions(function (Exceptions $exceptions): void {

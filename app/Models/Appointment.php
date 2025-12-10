@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Appointment extends Model
 {
     use HasFactory;
+    protected $connection = 'tenant';
+
 
     protected $fillable = [
         'customer_id',

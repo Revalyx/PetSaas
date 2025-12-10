@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Mascota extends Model
 {
     protected $table = 'mascotas';
+    protected $connection = 'tenant';
+
 
     protected $fillable = [
         'cliente_id',

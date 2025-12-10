@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>PetSaaS - Panel de Empresa</title>
+    <script src="//unpkg.com/alpinejs" defer></script>
+
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -71,6 +73,17 @@
                ? 'bg-gray-100/80 dark:bg-gray-800/80 font-semibold shadow-sm'
                : '' }}">
                🗂️ Citas
+            </a>
+
+            <a href="{{ route('tenant.products.index') }}"
+               class="px-4 py-2.5 rounded-xl transition flex items-center gap-2 
+               hover:bg-gray-100 dark:hover:bg-gray-800
+               {{ request()->routeIs('tenant.appointments.index')
+               || request()->routeIs('tenant.appointments.create')
+               || request()->routeIs('tenant.appointments.edit')
+               ? 'bg-gray-100/80 dark:bg-gray-800/80 font-semibold shadow-sm'
+               : '' }}">
+              📦  Productos
             </a>
 
             <a href="{{ route('tenant.appointments.calendar') }}"

@@ -59,7 +59,7 @@
                             {{ $a->pet?->nombre ?? '—' }}
                         </td>
 
-                        {{-- TIPO (Misma paleta que el calendario) --}}
+                        {{-- TIPO --}}
                         @php
                             $typeColors = [
                                 'muda'      => 'bg-green-600',
@@ -78,26 +78,25 @@
                         </td>
 
                         {{-- ESTADO --}}
+                        @php
+                            $labels = [
+                                'pending'   => 'Pendiente',
+                                'confirmed' => 'Confirmada',
+                                'cancelled' => 'Cancelada',
+                                'completed' => 'Completada',
+                            ];
+
+                            $colors = [
+                                'pending'   => 'bg-transparent text-gray-300 border border-gray-600',
+                                'confirmed' => 'bg-transparent text-gray-300 border border-gray-600',
+                                'completed' => 'bg-transparent text-gray-300 border border-gray-600',
+                                'cancelled' => 'bg-blue-600 text-white',
+                            ];
+
+                            $estado = $a->status ?? 'pending';
+                        @endphp
+
                         <td class="px-4 py-3">
-                            @php
-                                $labels = [
-                                    'pending'   => 'Pendiente',
-                                    'confirmed' => 'Confirmada',
-                                    'cancelled' => 'Cancelada',
-                                    'completed' => 'Completada',
-                                ];
-
-                                $colors = [
-    'pending'   => 'bg-transparent text-gray-300 border border-gray-600',
-    'confirmed' => 'bg-transparent text-gray-300 border border-gray-600',
-    'completed' => 'bg-transparent text-gray-300 border border-gray-600',
-    'cancelled' => 'bg-blue-600 text-white',
-];
-
-
-                                $estado = $a->status ?? 'pending';
-                            @endphp
-
                             <span class="px-3 py-1 text-white rounded-lg text-xs font-semibold {{ $colors[$estado] ?? 'bg-gray-500' }}">
                                 {{ $labels[$estado] ?? $estado }}
                             </span>
@@ -112,15 +111,12 @@
                                 ✏️ Editar
                             </a>
 
-                            {{-- ELIMINAR --}}
-                            <form method="POST" action="{{ route('tenant.appointments.destroy', $a->id) }}"
-                                  onsubmit="return confirm('¿Eliminar esta cita?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow">
-                                    🗑️
-                                </button>
-                            </form>
+                            {{-- ELIMINAR → abre modal --}}
+                            <button
+                                onclick="openDeleteModal({{ $a->id }})"
+                                class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow">
+                                🗑️
+                            </button>
 
                         </td>
 
@@ -132,5 +128,51 @@
     </div>
 
 </div>
+
+
+{{-- ============================= --}}
+{{-- MODAL DE CONFIRMACIÓN BORRADO --}}
+{{-- ============================= --}}
+<div id="modal-delete"
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden justify-center items-center z-50">
+    
+    <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-full max-w-md">
+
+        <h2 class="text-xl font-bold mb-4">Confirmar eliminación</h2>
+        <p class="text-gray-300 mb-6">¿Seguro que deseas eliminar esta cita?</p>
+
+        <div class="flex justify-end gap-3">
+            <button onclick="closeDeleteModal()"
+                    class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg">
+                Cancelar
+            </button>
+
+            <form method="POST" id="delete-form">
+                @csrf
+                @method('DELETE')
+                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
+                    Eliminar
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+{{-- SCRIPT MODAL --}}
+<script>
+    function openDeleteModal(id) {
+        document.getElementById('delete-form').action =
+            `/tenant/appointments/${id}`;
+        document.getElementById('modal-delete').classList.remove('hidden');
+        document.getElementById('modal-delete').classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('modal-delete').classList.add('hidden');
+        document.getElementById('modal-delete').classList.remove('flex');
+    }
+</script>
 
 @endsection

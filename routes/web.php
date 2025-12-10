@@ -6,6 +6,7 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\ClienteController;
 use App\Http\Controllers\Tenant\MascotaController;
+use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\AppointmentController;
 
 // ========================================================
@@ -48,8 +49,9 @@ Route::middleware(['auth', 'tenant'])
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
 
+
         // -------------------------------
-        // CLIENTES CRUD
+        // CLIENTES CRUD COMPLETO
         // -------------------------------
         Route::get('/clientes', [ClienteController::class, 'index'])
             ->name('clientes.index');
@@ -60,110 +62,98 @@ Route::middleware(['auth', 'tenant'])
         Route::post('/clientes', [ClienteController::class, 'store'])
             ->name('clientes.store');
 
+        Route::get('/clientes/{id}/editar', [ClienteController::class, 'edit'])
+            ->name('clientes.edit');
+
+        Route::put('/clientes/{id}', [ClienteController::class, 'update'])
+            ->name('clientes.update');
+
+        Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])
+            ->name('clientes.destroy');
+
+
         // -------------------------------
         // MASCOTAS CRUD COMPLETO
         // -------------------------------
-        Route::get('/mascotas', [MascotaController::class, 'index'])
-            ->name('mascotas.index');
-
-        Route::get('/mascotas/crear', [MascotaController::class, 'create'])
-            ->name('mascotas.create');
-
-        Route::post('/mascotas', [MascotaController::class, 'store'])
-            ->name('mascotas.store');
-
-        Route::get('/mascotas/{id}/editar', [MascotaController::class, 'edit'])
-            ->name('mascotas.edit');
-
-        Route::put('/mascotas/{id}', [MascotaController::class, 'update'])
-            ->name('mascotas.update');
-
-        Route::delete('/mascotas/{id}', [MascotaController::class, 'destroy'])
-            ->name('mascotas.destroy');
+        Route::get('/mascotas', [MascotaController::class, 'index'])->name('mascotas.index');
+        Route::get('/mascotas/crear', [MascotaController::class, 'create'])->name('mascotas.create');
+        Route::post('/mascotas', [MascotaController::class, 'store'])->name('mascotas.store');
+        Route::get('/mascotas/{id}/editar', [MascotaController::class, 'edit'])->name('mascotas.edit');
+        Route::put('/mascotas/{id}', [MascotaController::class, 'update'])->name('mascotas.update');
+        Route::delete('/mascotas/{id}', [MascotaController::class, 'destroy'])->name('mascotas.destroy');
 
         // -------------------------------
-// APPOINTMENTS (CITAS)
-// -------------------------------
-Route::prefix('appointments')->name('appointments.')->group(function () {
+        // PRODUCTOS CRUD COMPLETO (CORREGIDO)
+        // -------------------------------
+        // Productos CRUD COMPLETO
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-    Route::get('/', [AppointmentController::class, 'index'])
-        ->name('index');
+        // -------------------------------
+        // APPOINTMENTS (CITAS)
+        // -------------------------------
+        Route::prefix('appointments')->name('appointments.')->group(function () {
 
-    Route::get('/create', [AppointmentController::class, 'create'])
-        ->name('create');
+            Route::get('/', [AppointmentController::class, 'index'])->name('index');
+            Route::get('/create', [AppointmentController::class, 'create'])->name('create');
+            Route::post('/', [AppointmentController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [AppointmentController::class, 'edit'])->name('edit');
 
-    Route::post('/', [AppointmentController::class, 'store'])
-        ->name('store');
+            Route::get('/calendar/events', [AppointmentController::class, 'calendarEvents'])
+                ->name('calendar.events');
 
-    Route::get('/{id}/edit', [AppointmentController::class, 'edit'])
-        ->name('edit');
+            Route::put('/{id}', [AppointmentController::class, 'update'])->name('update');
+            Route::delete('/{id}', [AppointmentController::class, 'destroy'])->name('destroy');
+        });
 
-    // 🔥 RUTA CORRECTA PARA FULLCALENDAR
-    Route::get('/calendar/events', [AppointmentController::class, 'calendarEvents'])
-        ->name('calendar.events');
-
-    Route::put('/{id}', [AppointmentController::class, 'update'])
-        ->name('update');
-
-    Route::delete('/{id}', [AppointmentController::class, 'destroy'])
-        ->name('destroy');
-});
-
-        // Calendario de citas
         Route::get('/appointments/calendar', [\App\Http\Controllers\AppointmentCalendarController::class, 'index'])
             ->name('appointments.calendar');
 
         Route::get('/appointments/calendar-events', [\App\Http\Controllers\AppointmentCalendarController::class, 'events'])
             ->name('appointments.calendar.events');
-
-});
-
-// ========================================================
-// SUPERADMIN - HEALTH CHECK
-// ========================================================
-Route::get('/superadmin/health', [SuperAdminController::class, 'systemHealth'])
-    ->middleware(['auth', 'superadmin'])
-    ->name('superadmin.health');
+    });
 
 // ========================================================
-// SUPERADMIN PANEL
+// SUPERADMIN
 // ========================================================
 Route::middleware(['auth', 'superadmin'])
     ->prefix('superadmin')
     ->name('superadmin.')
     ->group(function () {
 
-        // Dashboard
+        Route::get('/health', function () {
+
+    return view('superadmin.health.index', [
+        'php'     => PHP_VERSION,
+        'laravel' => app()->version(),
+        'time'    => now()->toDateTimeString(),
+        'tenants' => \App\Models\Tenant::all(),
+    ]);
+
+})->name('health');
+
+
+
         Route::get('/dashboard', [SuperAdminController::class, 'index'])
             ->name('dashboard');
 
-        // TENANTS CRUD
-        Route::get('/tenants', [SuperAdminController::class, 'tenants'])
-            ->name('tenants.index');
+        Route::get('/tenants', [SuperAdminController::class, 'tenants'])->name('tenants.index');
+        Route::get('/tenants/create', [SuperAdminController::class, 'createTenant'])->name('tenants.create');
+        Route::post('/tenants/store', [SuperAdminController::class, 'storeTenant'])->name('tenants.store');
+        Route::delete('/tenants/{id}', [SuperAdminController::class, 'destroy'])->name('tenants.destroy');
 
-        Route::get('/tenants/create', [SuperAdminController::class, 'createTenant'])
-            ->name('tenants.create');
+        Route::get('/users/create', [SuperAdminController::class, 'createUser'])->name('users.create');
+        Route::post('/users/store', [SuperAdminController::class, 'storeUser'])->name('users.store');
 
-        Route::post('/tenants/store', [SuperAdminController::class, 'storeTenant'])
-            ->name('tenants.store');
-
-        Route::delete('/tenants/{id}', [SuperAdminController::class, 'destroy'])
-            ->name('tenants.destroy');
-
-        // USERS CRUD
-        Route::get('/users/create', [SuperAdminController::class, 'createUser'])
-            ->name('users.create');
-
-        Route::post('/users/store', [SuperAdminController::class, 'storeUser'])
-            ->name('users.store');
-
-        // Ejecutar migraciones del tenant actual
         Route::get('/run-tenant-migrations', function () {
             \Artisan::call('migrate', [
                 '--database' => 'tenant',
                 '--force'    => true
             ]);
-
             return "Migraciones ejecutadas en este tenant.";
         })->middleware(['auth', 'tenant']);
-});
+    });
