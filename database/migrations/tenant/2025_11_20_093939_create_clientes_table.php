@@ -11,11 +11,9 @@ return new class extends Migration
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
 
-            // Obligatorios
             $table->string('nombre');
             $table->string('apellidos');
 
-            // Opcionales
             $table->string('telefono')->nullable();
             $table->string('email')->nullable();
             $table->string('direccion')->nullable();

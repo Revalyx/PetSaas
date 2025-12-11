@@ -20,11 +20,11 @@ class TenantMiddleware
 
     $tenant = Tenant::find($user->tenant_id);
 
-    if (!$tenant) {
-        abort(500, "Tenant no encontrado.");
-    }
+    \Log::info("TENANT MIDDLEWARE ACTIVO", [
+        'tenant' => $tenant->slug,
+        'db' => $tenant->db_name
+    ]);
 
-    // CONFIGURAR CONEXIÓN DINÁMICA
     config([
         'database.connections.tenant.host'     => $tenant->db_host,
         'database.connections.tenant.database' => $tenant->db_name,
@@ -32,15 +32,12 @@ class TenantMiddleware
         'database.connections.tenant.password' => decrypt($tenant->db_password),
     ]);
 
-    // Aplicar
-    \DB::purge('tenant');
-    \DB::reconnect('tenant');
-
-    // Pasar tenant al request
-    $request->tenant = $tenant;
+    DB::purge('tenant');
+    DB::reconnect('tenant');
 
     return $next($request);
 }
+
 
 
 }

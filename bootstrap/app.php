@@ -21,6 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
     'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
 ]);
 
+// AÑADE ESTO PARA QUE SIEMPRE SE APLIQUE EL MIDDLEWARE EN LAS RUTAS /tenant/*
+    $middleware->group('tenant-area', [
+        \Illuminate\Auth\Middleware\Authenticate::class,
+        \App\Http\Middleware\TenantMiddleware::class,
+    ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

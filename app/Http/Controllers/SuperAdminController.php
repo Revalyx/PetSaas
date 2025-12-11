@@ -55,61 +55,49 @@ class SuperAdminController extends Controller
      * ====================================================
      */
     public function storeTenant(Request $request)
-    {
-        $request->validate([
-            'empresa' => 'required|string|max:255',
-            'slug'    => 'required|string|max:255|unique:tenants,slug',
-        ]);
+{
+    $request->validate([
+        'empresa' => 'required|string|max:255',
+        'slug'    => 'required|string|max:255|unique:tenants,slug',
+    ]);
 
-        $slug   = $request->slug;
-        $dbName = $slug;
+    $slug   = $request->slug;
+    $dbName = $slug;
 
-        /**
-         * 1️⃣ Crear base de datos física
-         */
-        DB::statement("CREATE DATABASE `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    // 1️⃣ Crear base de datos del tenant
+    DB::statement("CREATE DATABASE `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
-        /**
-         * 2️⃣ Registrar tenant en petsaas_core
-         */
-        $tenant = Tenant::create([
-            'name'        => $request->empresa,
-            'slug'        => $slug,
-            'db_name'     => $dbName,
-            'db_host'     => env('DB_HOST'),
-            'db_username' => env('DB_USERNAME'),
-            'db_password' => encrypt(env('DB_PASSWORD')),
-        ]);
+    // 2️⃣ Registrar tenant
+    $tenant = Tenant::create([
+        'name'        => $request->empresa,
+        'slug'        => $slug,
+        'db_name'     => $dbName,
+        'db_host'     => env('DB_HOST'),
+        'db_username' => env('DB_USERNAME'),
+        'db_password' => encrypt(env('DB_PASSWORD')),
+    ]);
 
-        /**
-         * 3️⃣ Configurar conexión dinámica del tenant
-         */
-        config([
-            'database.connections.tenant.host'     => $tenant->db_host,
-            'database.connections.tenant.database' => $tenant->db_name,
-            'database.connections.tenant.username' => $tenant->db_username,
-            'database.connections.tenant.password' => decrypt($tenant->db_password),
-        ]);
+    // 3️⃣ Conectar al tenant
+    config([
+        'database.connections.tenant.host'     => $tenant->db_host,
+        'database.connections.tenant.database' => $tenant->db_name,
+        'database.connections.tenant.username' => $tenant->db_username,
+        'database.connections.tenant.password' => decrypt($tenant->db_password),
+    ]);
 
-        DB::purge('tenant');
+    DB::purge('tenant');
 
-        /**
-         * 4️⃣ Ejecutar todas las migraciones del tenant (SIN PATH)
-         * Esto garantiza:
-         *  - users
-         *  - clientes
-         *  - mascotas
-         *  - citas
-         *  y cualquier migración futura
-         */
-        \Artisan::call('migrate', [
-            '--database' => 'tenant',
-            '--force'    => true
-        ]);
+    // 4️⃣ Migraciones del tenant (YA SIN users)
+    \Artisan::call('migrate', [
+    '--database' => 'tenant',
+    '--path'     => 'database/migrations/tenant',
+    '--force'    => true,
+]);
 
-        return redirect()->route('superadmin.dashboard')
-            ->with('success', 'Empresa creada con éxito.');
-    }
+    return redirect()->route('superadmin.dashboard')
+        ->with('success', 'Empresa creada con éxito.');
+}
+
 
 
 
@@ -162,53 +150,27 @@ class SuperAdminController extends Controller
      *  GUARDAR NUEVO USUARIO DE TENANT
      * ====================================================
      */
-    public function storeUser(Request $request)
-    {
-        $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|min:6',
-        ]);
+public function storeUser(Request $request)
+{
+    $request->validate([
+        'tenant_id' => 'required|exists:tenants,id',
+        'name'      => 'required|string|max:255',
+        'email'     => 'required|email|unique:users,email',
+        'password'  => 'required|min:6',
+    ]);
 
-        $tenant = Tenant::findOrFail($request->tenant_id);
+    User::create([
+        'tenant_id'   => $request->tenant_id,
+        'name'        => $request->name,
+        'email'       => $request->email,
+        'password'    => Hash::make($request->password),
+    ]);
 
-        /**
-         * 1️⃣ Crear usuario en petsaas_core
-         */
-        User::create([
-            'tenant_id'   => $tenant->id,
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'password'    => Hash::make($request->password),
-        ]);
+    return redirect()->route('superadmin.dashboard')
+        ->with('success', 'Usuario creado correctamente.');
+}
 
-        /**
-         * 2️⃣ Configurar conexión tenant correctamente
-         */
-        config([
-            'database.connections.tenant.host'     => $tenant->db_host,
-            'database.connections.tenant.database' => $tenant->db_name,
-            'database.connections.tenant.username' => $tenant->db_username,
-            'database.connections.tenant.password' => decrypt($tenant->db_password),
-        ]);
 
-        DB::purge('tenant');
-
-        /**
-         * 3️⃣ Insertar usuario en la BD del tenant
-         */
-        DB::connection('tenant')->table('users')->insert([
-            'name'       => $request->name,
-            'email'      => $request->email,
-            'password'   => Hash::make($request->password),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return redirect()->route('superadmin.dashboard')
-            ->with('success', 'Usuario creado correctamente.');
-    }
 
 
     /**
@@ -265,9 +227,7 @@ class SuperAdminController extends Controller
 
             // 4️⃣ Estado
             $status = "OK";
-            if (!in_array('users', $tableNames)) {
-                $status = "FALTAN TABLAS";
-            }
+            
 
             // Añadir al array
             $data[] = [

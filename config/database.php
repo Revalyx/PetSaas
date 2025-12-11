@@ -125,16 +125,19 @@ return [
         */
 
         'tenant' => [
-            'driver' => 'mysql',
-            'host' => env('TENANT_DB_HOST', '127.0.0.1'),
-            'database' => env('TENANT_DB_NAME', ''),
-            'username' => env('TENANT_DB_USER', ''),
-            'password' => env('TENANT_DB_PASSWORD', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'strict' => true,
-        ],
+    'driver'   => 'mysql',
+    'host'     => '',
+    'database' => '',
+    'username' => '',
+    'password' => '',
+    'charset'  => 'utf8mb4',
+    'collation'=> 'utf8mb4_unicode_ci',
+    'prefix'   => '',
+    'strict'   => true,
+],
+
+
+
 
     ],
 

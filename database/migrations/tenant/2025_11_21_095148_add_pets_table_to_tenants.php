@@ -10,17 +10,20 @@ return new class extends Migration
     {
         Schema::create('mascotas', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('cliente_id');
 
             $table->string('nombre');
-            $table->string('especie')->nullable(); // perro, gato...
+            $table->string('especie')->nullable();
             $table->string('raza')->nullable();
             $table->integer('edad')->nullable();
             $table->text('notas')->nullable();
 
             $table->timestamps();
 
-            $table->foreign('cliente_id')->references('id')->on('clientes')->onDelete('cascade');
+            $table->foreign('cliente_id')
+                ->references('id')->on('clientes')
+                ->onDelete('cascade');
         });
     }
 

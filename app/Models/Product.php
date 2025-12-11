@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -11,20 +10,28 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
-    'name',
-    'description',
-    'price',
-    'stock',
-    'barcode',
-    'image_path',
-    'image_alt',
-];
+        'id_adicional',
+        'codigo_barras',
+        'categoria',
+        'producto',
+        'precio',
+        'porcentaje_impuesto',
+        'pvp',
+        'precio_real',
+        'beneficio',
+        'margen',
+        'stock',
+        'image_path',
+        'image_alt',
+    ];
 
-
-    // Helper para obtener URL pública de la imagen
+    // Accesor para obtener URL pública
     public function getImageUrlAttribute()
-{
-    return $this->image_path ? asset('storage/' . $this->image_path) : null;
-}
+    {
+        if (!$this->image_path) {
+            return null;
+        }
 
+        return asset('storage/' . $this->image_path);
+    }
 }

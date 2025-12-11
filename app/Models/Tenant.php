@@ -15,4 +15,8 @@ class Tenant extends Model
         'db_password',
         'is_active'
     ];
+
+    protected $casts = [
+
+    ];
 }

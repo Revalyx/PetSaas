@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Mascota;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 
 class MascotaController extends Controller
 {
@@ -24,9 +26,12 @@ class MascotaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cliente_id' => 'required|exists:clientes,id',
-            'nombre'     => 'required|string|max:255',
-        ]);
+    'cliente_id' => [
+        'required',
+        Rule::exists('tenant.clientes', 'id')
+    ],
+    'nombre' => 'required|string|max:255',
+]);
 
         Mascota::create($request->all());
 
@@ -44,27 +49,21 @@ class MascotaController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'cliente_id' => 'required|exists:clientes,id',
-            'nombre'     => 'required|string|max:255',
-        ]);
+{
+    $request->validate([
+        'cliente_id' => 'required|exists:clientes,id',
+        'nombre'     => 'required|string|max:255',
+        'raza'       => 'nullable|string|max:255',
+        'edad'       => 'nullable|integer',
+        'notas'      => 'nullable|string',
+    ]);
 
-        $mascota = Mascota::findOrFail($id);
-        $mascota->update($request->all());
+    $mascota = Mascota::findOrFail($id);
+    $mascota->update($request->all());
 
-        return redirect()
+    return redirect()
             ->route('tenant.mascotas.index')
             ->with('ok', 'Mascota actualizada correctamente');
-    }
+}
 
-    public function destroy($id)
-    {
-        $mascota = Mascota::findOrFail($id);
-        $mascota->delete();
-
-        return redirect()
-            ->route('tenant.mascotas.index')
-            ->with('ok', 'Mascota eliminada correctamente');
-    }
 }

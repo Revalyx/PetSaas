@@ -11,13 +11,12 @@ return new class extends Migration
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
 
-            // Relaciones obligatorias
+            // Relación obligatoria con clientes
             $table->unsignedBigInteger('customer_id');
 
-            // Relaciones opcionales
+            // Opcionales
             $table->unsignedBigInteger('pet_id')->nullable();
-            $table->unsignedBigInteger('service_id')->nullable(); 
-            // Nota: service_id NO tiene foreign key porque todavía no existe la tabla services
+            $table->unsignedBigInteger('service_id')->nullable(); // futuro
 
             // Datos de la cita
             $table->date('date');
@@ -35,14 +34,14 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Foreign keys REALES que sí existen
+            // Foreign keys
             $table->foreign('customer_id')
-                ->references('id')->on('clientes')
-                ->onDelete('cascade');
+                  ->references('id')->on('clientes')
+                  ->onDelete('cascade');
 
             $table->foreign('pet_id')
-                ->references('id')->on('mascotas')
-                ->onDelete('set null');
+                  ->references('id')->on('mascotas')
+                  ->onDelete('set null');
         });
     }
 
