@@ -62,6 +62,19 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        'core' => [
+            'driver' => 'mysql',
+            'host' => env('DB_CORE_HOST', env('DB_HOST')),
+            'port' => env('DB_CORE_PORT', env('DB_PORT')),
+            'database' => env('DB_CORE_DATABASE', 'petsaas_core'),
+            'username' => env('DB_CORE_USERNAME', env('DB_USERNAME')),
+            'password' => env('DB_CORE_PASSWORD', env('DB_PASSWORD')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+        ],
+
 
         'mariadb' => [
             'driver' => 'mariadb',
