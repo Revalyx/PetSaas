@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\MeController;
+use App\Http\Controllers\Api\Auth\GoogleLoginController;
+use App\Http\Controllers\Api\Auth\LogoutController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -43,10 +46,24 @@ Route::prefix('auth')->group(function () {
     |----------------------------------------------------------------------
     | Login
     |----------------------------------------------------------------------
+    | Login clásico con email + password.
     | Devuelve un api_token propio para la app.
     |
     */
     Route::post('/login', [LoginController::class, 'login']);
+
+    /*
+    |----------------------------------------------------------------------
+    | Login con Google
+    |----------------------------------------------------------------------
+    | Login / registro usando Google ID Token.
+    | Devuelve un api_token propio para la app.
+    |
+    */
+    Route::post('/google', [GoogleLoginController::class, 'login']);
+
+    // Logout (revoca token)
+    Route::middleware('auth.app')->post('/logout', [LogoutController::class, 'logout']);
 
     /*
     |----------------------------------------------------------------------
