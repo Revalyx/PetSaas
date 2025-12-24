@@ -8,6 +8,9 @@ use App\Http\Controllers\Tenant\ClienteController;
 use App\Http\Controllers\Tenant\MascotaController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\Tenant\SaleController;
+use App\Http\Controllers\Tenant\SaleItemController;
+
 
 // ========================================================
 // LOGIN + LOGOUT
@@ -71,6 +74,56 @@ Route::middleware(['auth', 'tenant'])
         Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])
             ->name('clientes.destroy');
 
+        // -------------------------------
+        // VENTAS
+        // -------------------------------
+        Route::get('/sales', [SaleController::class, 'index'])
+            ->name('sales.index');
+
+        Route::get('/sales/{sale}', [SaleController::class, 'show'])
+            ->name('sales.show');
+
+        Route::post('/sales/{sale}/items/from-product', [SaleItemController::class, 'fromProduct'])
+            ->name('sales.items.from-product');
+
+        Route::post('/sales', [SaleController::class, 'store'])
+            ->name('sales.store');
+
+        Route::delete(
+            '/sales/{sale}/items/{item}',
+            [SaleItemController::class, 'destroy']
+        )->name('sales.items.destroy');
+        Route::post(
+            '/sales/{sale}/assign-client',
+            [\App\Http\Controllers\Tenant\SaleController::class, 'assignClient']
+        )->name('sales.assign-client');
+
+        Route::delete(
+            '/sales/{sale}',
+            [\App\Http\Controllers\Tenant\SaleController::class, 'destroy']
+        )->name('sales.destroy');
+
+        Route::post(
+            '/sales/{sale}/close',
+            [\App\Http\Controllers\Tenant\SaleController::class, 'close']
+        )->name('sales.close');
+
+        Route::get('/tenant/sales/{sale}/document', 
+            [SaleController::class, 'document']
+        )->name('tenant.sales.document');
+
+        Route::get('/sales/{sale}/invoice',
+            [SaleController::class, 'invoice']
+        )->name('sales.invoice');
+
+
+
+
+
+    
+
+    
+
 
         // -------------------------------
         // MASCOTAS CRUD COMPLETO
@@ -116,6 +169,7 @@ Route::middleware(['auth', 'tenant'])
         Route::get('/appointments/calendar-events', [\App\Http\Controllers\AppointmentCalendarController::class, 'events'])
             ->name('appointments.calendar.events');
     });
+
 
 // ========================================================
 // SUPERADMIN

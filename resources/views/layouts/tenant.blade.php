@@ -86,6 +86,16 @@
               📦  Productos
             </a>
 
+            <a href="{{ route('tenant.sales.index') }}"
+               class="px-4 py-2.5 rounded-xl transition flex items-center gap-2 
+               hover:bg-gray-100 dark:hover:bg-gray-800
+               {{ request()->routeIs('tenant.sales.index')
+               || request()->routeIs('tenant.sales.show')
+               ? 'bg-gray-100/80 dark:bg-gray-800/80 font-semibold shadow-sm'
+               : '' }}">
+              📦  Comenzar Venta
+            </a>
+
             <a href="{{ route('tenant.appointments.calendar') }}"
             class="px-4 py-2.5 rounded-xl transition flex items-center gap-2 
                 hover:bg-gray-100 dark:hover:bg-gray-800
