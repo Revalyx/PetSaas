@@ -41,6 +41,9 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $tenant = $this->getTenant();
+        
+
+
 
         $request->validate([
             'id_adicional'        => 'nullable|string|max:50',
@@ -55,7 +58,7 @@ class ProductController extends Controller
             'margen'              => 'nullable|numeric|min:0|max:999999.99',
             'stock'               => 'required|integer|min:0',
 
-            'image'               => 'nullable|image|mimes:jpg,png,jpeg,webp|max:4096',
+            'image' => 'nullable|image|mimetypes:image/jpeg,image/png,image/webp,image/heic,image/heif',
             'image_alt'           => 'nullable|string|max:255'
         ]);
 
@@ -108,6 +111,29 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         return view('tenant.products.edit', compact('product'));
     }
+
+public function updateStock(Request $request, $id)
+{
+    $tenant = $this->getTenant(); // 🔑 CLAVE
+
+    $request->validate([
+        'quantity' => 'required|integer'
+    ]);
+
+    $product = Product::findOrFail($id);
+
+    $product->increment('stock', $request->quantity);
+
+    if ($product->stock < 0) {
+        $product->update(['stock' => 0]);
+    }
+
+    return redirect()
+        ->route('tenant.products.index')
+        ->with('ok', 'Stock actualizado correctamente.');
+}
+
+
 
     public function update(Request $request, $id)
     {

@@ -8,39 +8,51 @@
 
     <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl w-full max-w-2xl">
 
-        <h2 class="text-2xl font-bold mb-6 text-center text-white">Crear nueva cita</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center text-white">
+            Crear nueva cita
+        </h2>
 
-        <form method="POST" action="{{ route('tenant.appointments.store') }}" class="space-y-6 text-sm">
+        <form method="POST"
+              action="{{ route('tenant.appointments.store') }}"
+              class="space-y-6 text-sm">
             @csrf
 
             {{-- CLIENTE --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Cliente</label>
-                <select name="customer_id"
-                    class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
-                    required>
+                <label class="block font-semibold mb-1 text-white">
+                    Cliente
+                </label>
+                <select id="customerSelect"
+                        name="customer_id"
+                        class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
+                        required>
                     <option value="">Seleccione un cliente...</option>
                     @foreach($customers as $c)
-                        <option value="{{ $c->id }}">{{ $c->nombre }} {{ $c->apellidos }}</option>
+                        <option value="{{ $c->id }}">
+                            {{ $c->nombre }} {{ $c->apellidos }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
             {{-- MASCOTA --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Mascota (opcional)</label>
-                <select name="pet_id"
-                    class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2">
-                    <option value="">Sin mascota</option>
-                    @foreach($pets as $p)
-                        <option value="{{ $p->id }}">{{ $p->nombre }}</option>
-                    @endforeach
+                <label class="block font-semibold mb-1 text-white">
+                    Mascota (opcional)
+                </label>
+                <select id="petSelect"
+                        name="pet_id"
+                        class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
+                        disabled>
+                    <option value="">Seleccione primero un cliente</option>
                 </select>
             </div>
 
             {{-- TIPO DE CITA --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Tipo de cita</label>
+                <label class="block font-semibold mb-1 text-white">
+                    Tipo de cita
+                </label>
                 <select name="type"
                         class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
                         required>
@@ -54,15 +66,22 @@
 
             {{-- CITA DIFÍCIL --}}
             <div class="flex items-center gap-2">
-                <input type="checkbox" name="is_difficult" value="1"
+                <input type="checkbox"
+                       name="is_difficult"
+                       value="1"
                        class="w-4 h-4 bg-gray-700 border-gray-500 rounded">
-                <label class="font-semibold text-white">Marcar como cita difícil</label>
+                <label class="font-semibold text-white">
+                    Marcar como cita difícil
+                </label>
             </div>
 
             {{-- FECHA --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Fecha</label>
-                <input type="date" name="date"
+                <label class="block font-semibold mb-1 text-white">
+                    Fecha
+                </label>
+                <input type="date"
+                       name="date"
                        value="{{ old('date', $prefillDate ?? '') }}"
                        class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
                        required>
@@ -70,22 +89,30 @@
 
             {{-- HORA INICIO --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Hora inicio</label>
-                <input type="time" name="start_time"
+                <label class="block font-semibold mb-1 text-white">
+                    Hora inicio
+                </label>
+                <input type="time"
+                       name="start_time"
                        class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
                        required>
             </div>
 
             {{-- HORA FIN --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Hora fin (opcional)</label>
-                <input type="time" name="end_time"
+                <label class="block font-semibold mb-1 text-white">
+                    Hora fin (opcional)
+                </label>
+                <input type="time"
+                       name="end_time"
                        class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2">
             </div>
 
             {{-- ESTADO --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Estado</label>
+                <label class="block font-semibold mb-1 text-white">
+                    Estado
+                </label>
                 <select name="status"
                         class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2">
                     <option value="pending">Pendiente</option>
@@ -97,16 +124,21 @@
 
             {{-- NOTAS --}}
             <div>
-                <label class="block font-semibold mb-1 text-white">Notas</label>
-                <textarea name="notes" rows="3"
-                    class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
-                    placeholder="Detalles adicionales..."></textarea>
+                <label class="block font-semibold mb-1 text-white">
+                    Notas
+                </label>
+                <textarea name="notes"
+                          rows="3"
+                          class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-600 rounded-lg px-3 py-2"
+                          placeholder="Detalles adicionales..."></textarea>
             </div>
 
             {{-- BOTONES --}}
             <div class="flex justify-end gap-3 pt-3">
                 <a href="{{ route('tenant.appointments.index') }}"
-                   class="px-4 py-2 bg-gray-600 text-white rounded-lg">Cancelar</a>
+                   class="px-4 py-2 bg-gray-600 text-white rounded-lg">
+                    Cancelar
+                </a>
 
                 <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                     Guardar
@@ -118,5 +150,50 @@
     </div>
 
 </div>
+
+{{-- =========================
+     JS: CARGA DE MASCOTAS
+========================= --}}
+<script>
+document.getElementById('customerSelect').addEventListener('change', function () {
+
+    const clientId = this.value;
+    const petSelect = document.getElementById('petSelect');
+
+    petSelect.disabled = true;
+    petSelect.innerHTML = '<option>Cargando mascotas...</option>';
+
+    if (!clientId) {
+        petSelect.innerHTML = '<option>Seleccione primero un cliente</option>';
+        return;
+    }
+
+    fetch(`/tenant/clients/${clientId}/pets`)
+        .then(res => res.json())
+        .then(pets => {
+
+            petSelect.innerHTML = '<option value="">Sin mascota</option>';
+            petSelect.disabled = false;
+
+            if (pets.length === 0) {
+                const opt = document.createElement('option');
+                opt.disabled = true;
+                opt.textContent = '(Este cliente no tiene mascotas)';
+                petSelect.appendChild(opt);
+                return;
+            }
+
+            pets.forEach(pet => {
+                const opt = document.createElement('option');
+                opt.value = pet.id;
+                opt.textContent = pet.nombre;
+                petSelect.appendChild(opt);
+            });
+        })
+        .catch(() => {
+            petSelect.innerHTML = '<option>Error al cargar mascotas</option>';
+        });
+});
+</script>
 
 @endsection

@@ -6,6 +6,8 @@ use App\Models\Cliente;
 use App\Models\Mascota;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use App\Models\Tenant;
+
 
 class AppointmentController extends Controller
 {
@@ -31,6 +33,27 @@ class AppointmentController extends Controller
             compact('customers', 'pets', 'prefillDate')
         );
     }
+    public function petsByClient($clientId)
+{
+    $tenant = $this->getTenant();
+
+    $pets = Mascota::where('cliente_id', $clientId)
+        ->orderBy('nombre')
+        ->get(['id', 'nombre']);
+
+    return response()->json($pets);
+}
+private function getTenant()
+{
+    $user = auth()->user();
+
+    if (!$user || !$user->tenant_id) {
+        abort(403, 'Usuario sin tenant');
+    }
+
+    return Tenant::findOrFail($user->tenant_id);
+}
+
 
     /** GUARDAR */
     public function store(Request $request)

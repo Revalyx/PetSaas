@@ -74,6 +74,10 @@ Route::middleware(['auth', 'tenant'])
         Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])
             ->name('clientes.destroy');
 
+        Route::get('/clients/{client}/pets',[AppointmentController::class, 'petsByClient'])
+            ->name('tenant.clients.pets');
+    
+
         // -------------------------------
         // VENTAS
         // -------------------------------
@@ -145,6 +149,8 @@ Route::middleware(['auth', 'tenant'])
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+        Route::post('/products/{product}/stock',[ProductController::class, 'updateStock'])->name('tenant.products.stock');
+
 
         // -------------------------------
         // APPOINTMENTS (CITAS)

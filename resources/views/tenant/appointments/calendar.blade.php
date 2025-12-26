@@ -12,10 +12,14 @@
 
 <style>
 /* ================================================================
-   ESTILO GOOGLE CALENDAR - DARK MODE
+   ESTILO GOOGLE CALENDAR - DARK MODE (CORREGIDO)
 ================================================================ */
 
 .fc { font-family: "Inter", sans-serif; }
+
+/* ======================
+   TOOLBAR
+====================== */
 
 .fc-toolbar-title {
     font-size: 1.45rem !important;
@@ -40,18 +44,28 @@
 .fc-button:hover { background:#d6d6d6 !important; }
 .dark .fc-button:hover { background:#3d4655 !important; }
 
+/* ======================
+   GRID / DAYS
+====================== */
+
 .dark .fc-daygrid-day-frame { border-color:#2c3342 !important; }
 .dark .fc-theme-standard td,
 .dark .fc-theme-standard th { border-color:#394457 !important; }
 
-.fc .fc-daygrid-day-number { color:#e5e5e5 !important; font-weight:600; }
+.fc .fc-daygrid-day-number {
+    color:#e5e5e5 !important;
+    font-weight:600;
+}
 
 .fc-day-today {
     background:rgba(66,133,244,0.18) !important;
     border-radius:8px;
 }
 
-/* Colores por tipo */
+/* ======================
+   EVENTOS POR TIPO
+====================== */
+
 .fc-event.muda      { background-color:#34A853 !important; border-color:#34A853 !important; }
 .fc-event.corte     { background-color:#EA4335 !important; border-color:#EA4335 !important; }
 .fc-event.arreglo   { background-color:#FF4FB2 !important; border-color:#FF4FB2 !important; }
@@ -59,22 +73,69 @@
 .fc-event.cancelled { background-color:#4285F4 !important; border-color:#4285F4 !important; }
 .fc-event.dificiles { background-color:#9AA0A6 !important; border-color:#9AA0A6 !important; }
 
+/* ======================
+   EVENTOS (TIMEGRID)
+====================== */
+
 .fc-event {
     border-radius: 8px !important;
-    padding: 4px 8px !important;
     font-size: 0.88rem !important;
     font-weight: 500 !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.12);
-    transition: 0.12s;
     color: white !important;
+
+    padding: 6px 8px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+
+    backdrop-filter: blur(2px);
+    border-left: 4px solid rgba(255,255,255,0.45) !important;
 }
 
+/* Contenido interno bien centrado */
+.fc-event-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+/* Hover elegante, sin romper layout */
 .fc-event:hover {
-    transform: scale(1.02);
+    transform: translateY(-1px);
     filter: brightness(1.08);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
 }
 
-/* Leyenda */
+/* Texto */
+.fc-event-title {
+    white-space: normal !important;
+    word-break: break-word;
+    line-height: 1.25;
+}
+
+.fc-event-time {
+    font-size: 0.72rem;
+    opacity: 0.85;
+    margin-bottom: 2px;
+}
+
+/* ======================
+   CABECERAS
+====================== */
+
+.fc-col-header-cell {
+    background: rgba(255,255,255,0.04);
+}
+
+.fc-col-header-cell-cushion {
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+/* ======================
+   LEYENDA
+====================== */
+
 .legend {
     display:flex;
     flex-wrap:wrap;
@@ -100,9 +161,9 @@
     border-radius:4px;
 }
 
-/* ==============================
-   MODAL DE DETALLES — Google Style
-============================== */
+/* ======================
+   MODALES
+====================== */
 
 .modal-backdrop {
     position:fixed;
@@ -146,9 +207,15 @@
 }
 .modal-close-btn:hover { color:white; }
 
-.modal-body { padding:18px 20px; font-size:0.95rem; }
+.modal-body {
+    padding:18px 20px;
+    font-size:0.95rem;
+}
 
-.modal-row { margin-bottom:14px; display:flex; }
+.modal-row {
+    margin-bottom:14px;
+    display:flex;
+}
 
 .modal-label {
     width:115px;
@@ -176,15 +243,33 @@
 .modal-btn-close { background:#4b5563; color:white; }
 .modal-btn:hover { filter:brightness(1.1); }
 
-/* ==========================
-   MODAL DE ELIMINACIÓN
-========================== */
+/* ======================
+   CALENDARIO CONTENEDOR
+====================== */
+
+#calendar {
+    background: linear-gradient(180deg, #1e2533, #161c27);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ======================
+   MODAL DELETE
+====================== */
 
 #modal-delete {
     display:none;
 }
 
+/* Altura mínima para eventos cortos */
+.fc-timegrid-event {
+    min-height: 48px !important;
+}
+
 </style>
+
 
 
 {{-- ================================
@@ -358,6 +443,18 @@ document.addEventListener('DOMContentLoaded', function() {
         contentHeight: "auto",
         stickyHeaderDates: false,
         nowIndicator: true,
+        dayMaxEvents: true,
+        eventDisplay: 'block',
+        slotMinTime: "08:00:00",
+        slotMaxTime: "21:00:00",
+
+        slotLabelFormat: {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+},
+
+
 
         events: "{{ route('tenant.appointments.calendar.events') }}",
 
