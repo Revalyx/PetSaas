@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Mascota;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-
 
 class MascotaController extends Controller
 {
@@ -19,19 +17,20 @@ class MascotaController extends Controller
 
     public function create()
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::orderBy('nombre')->get();
         return view('mascotas.create', compact('clientes'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-    'cliente_id' => [
-        'required',
-        Rule::exists('tenant.clientes', 'id')
-    ],
-    'nombre' => 'required|string|max:255',
-]);
+            'cliente_id' => 'required|integer',
+            'nombre'     => 'required|string|max:255',
+            'especie'    => 'nullable|string|max:255',
+            'raza'       => 'nullable|string|max:255',
+            'edad'       => 'nullable|integer',
+            'notas'      => 'nullable|string',
+        ]);
 
         Mascota::create($request->all());
 
@@ -42,28 +41,37 @@ class MascotaController extends Controller
 
     public function edit($id)
     {
-        $mascota  = Mascota::findOrFail($id);
-        $clientes = Cliente::all();
+        $mascota  = Mascota::with('cliente')->findOrFail($id);
+        $clientes = Cliente::orderBy('nombre')->get();
 
         return view('mascotas.edit', compact('mascota', 'clientes'));
     }
 
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'cliente_id' => 'required|exists:clientes,id',
-        'nombre'     => 'required|string|max:255',
-        'raza'       => 'nullable|string|max:255',
-        'edad'       => 'nullable|integer',
-        'notas'      => 'nullable|string',
-    ]);
+    {
+        $request->validate([
+            'cliente_id' => 'required|integer',
+            'nombre'     => 'required|string|max:255',
+            'especie'    => 'nullable|string|max:255',
+            'raza'       => 'nullable|string|max:255',
+            'edad'       => 'nullable|integer',
+            'notas'      => 'nullable|string',
+        ]);
 
-    $mascota = Mascota::findOrFail($id);
-    $mascota->update($request->all());
+        $mascota = Mascota::findOrFail($id);
+        $mascota->update($request->all());
 
-    return redirect()
+        return redirect()
             ->route('tenant.mascotas.index')
             ->with('ok', 'Mascota actualizada correctamente');
-}
+    }
 
+    public function destroy($id)
+    {
+        Mascota::findOrFail($id)->delete();
+
+        return redirect()
+            ->route('tenant.mascotas.index')
+            ->with('ok', 'Mascota eliminada correctamente');
+    }
 }

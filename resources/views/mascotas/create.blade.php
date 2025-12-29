@@ -3,76 +3,163 @@
 @section('title', 'Nueva Mascota')
 
 @section('content')
+<div class="p-6 max-w-4xl mx-auto">
 
-<div class="bg-gray-900/20 dark:bg-gray-800/20 p-6 rounded-xl shadow-xl max-w-4xl mx-auto">
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            Nueva mascota
+        </h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+            Registre una nueva mascota asociada a un cliente
+        </p>
+    </div>
 
-    <h2 class="text-xl font-bold text-center mb-4">Nueva Mascota</h2>
-
-    <form method="POST" action="{{ route('tenant.mascotas.store') }}" class="grid grid-cols-2 gap-4">
+    <!-- CARD FORM -->
+    <form
+        method="POST"
+        action="{{ route('tenant.mascotas.store') }}"
+        class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl
+               border border-slate-200 dark:border-slate-700
+               p-6 grid grid-cols-1 md:grid-cols-2 gap-6"
+    >
         @csrf
 
-        {{-- CLIENTE (ocupa 2 columnas) --}}
-        <div class="col-span-2">
-            <label class="block text-sm font-medium mb-1">Cliente</label>
-            <select name="cliente_id"
-                class="w-full border rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white h-9">
+        <!-- CLIENTE (2 columnas) -->
+        <div class="md:col-span-2">
+            <label class="block text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                Cliente <span class="text-red-500">*</span>
+            </label>
+            <select
+                name="cliente_id"
+                required
+                class="w-full rounded-lg px-4 py-2
+                       bg-slate-50 dark:bg-slate-700
+                       border border-slate-300 dark:border-slate-600
+                       text-slate-800 dark:text-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
                 @foreach ($clientes as $c)
                     <option value="{{ $c->id }}">
-                        {{ $c->nombre }} {{ $c->apellidos ?? '' }} — {{ $c->email ?? 'Sin email' }}
+                        {{ $c->nombre }} {{ $c->apellidos ?? '' }}
+                        — {{ $c->email ?? 'Sin email' }}
                     </option>
                 @endforeach
             </select>
         </div>
 
-        {{-- NOMBRE --}}
+        <!-- NOMBRE -->
         <div>
-            <label class="block text-sm font-medium mb-1">Nombre</label>
-            <input name="nombre" required
-                   class="w-full border rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white h-9"
-                   placeholder="Thor, Lola, Nilo…">
+            <label class="block text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                Nombre <span class="text-red-500">*</span>
+            </label>
+            <input
+                name="nombre"
+                required
+                placeholder="Thor, Lola, Nilo…"
+                class="w-full rounded-lg px-4 py-2
+                       bg-slate-50 dark:bg-slate-700
+                       border border-slate-300 dark:border-slate-600
+                       text-slate-800 dark:text-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
         </div>
 
-        {{-- ESPECIE --}}
+        <!-- ESPECIE -->
         <div>
-            <label class="block text-sm font-medium mb-1">Especie</label>
-            <input name="especie"
-                   class="w-full border rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white h-9"
-                   placeholder="Perro, Gato…">
+            <label class="block text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                Especie
+            </label>
+            <input
+                name="especie"
+                placeholder="Perro, Gato…"
+                class="w-full rounded-lg px-4 py-2
+                       bg-slate-50 dark:bg-slate-700
+                       border border-slate-300 dark:border-slate-600
+                       text-slate-800 dark:text-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
         </div>
 
-        {{-- RAZA --}}
+        <!-- RAZA -->
         <div>
-            <label class="block text-sm font-medium mb-1">Raza</label>
-            <input name="raza"
-                   class="w-full border rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white h-9"
-                   placeholder="Labrador, Siamés…">
+            <label class="block text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                Raza
+            </label>
+            <input
+                name="raza"
+                placeholder="Labrador, Siamés…"
+                class="w-full rounded-lg px-4 py-2
+                       bg-slate-50 dark:bg-slate-700
+                       border border-slate-300 dark:border-slate-600
+                       text-slate-800 dark:text-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
         </div>
 
-        {{-- EDAD --}}
+        <!-- EDAD -->
         <div>
-            <label class="block text-sm font-medium mb-1">Edad</label>
-            <input name="edad" type="number"
-                   class="w-full border rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white h-9"
-                   placeholder="En años">
+            <label class="block text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                Edad
+            </label>
+            <input
+                name="edad"
+                type="number"
+                min="0"
+                placeholder="En años"
+                class="w-full rounded-lg px-4 py-2
+                       bg-slate-50 dark:bg-slate-700
+                       border border-slate-300 dark:border-slate-600
+                       text-slate-800 dark:text-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
         </div>
 
-        {{-- NOTAS (ocupa 2 columnas y bajita) --}}
-        <div class="col-span-2">
-            <label class="block text-sm font-medium mb-1">Notas</label>
-            <textarea name="notas"
-                class="w-full border rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white h-20 resize-none"
-                placeholder="Comportamiento, alergias…"></textarea>
+        <!-- NOTAS (2 columnas) -->
+        <div class="md:col-span-2">
+            <label class="block text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">
+                Notas
+            </label>
+            <textarea
+                name="notas"
+                rows="4"
+                placeholder="Comportamiento, alergias, observaciones…"
+                class="w-full rounded-lg px-4 py-2
+                       bg-slate-50 dark:bg-slate-700
+                       border border-slate-300 dark:border-slate-600
+                       text-slate-800 dark:text-slate-100
+                       resize-none
+                       focus:outline-none focus:ring-2 focus:ring-teal-500"
+            ></textarea>
         </div>
 
-        {{-- BOTÓN (ocupa 2 columnas) --}}
-        <div class="col-span-2 flex justify-end mt-1">
-            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
-                Guardar
+        <!-- ACTIONS (2 columnas) -->
+        <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+
+            <a
+                href="{{ route('tenant.mascotas.index') }}"
+                class="px-4 py-2 rounded-lg
+                       bg-slate-200 dark:bg-slate-600
+                       text-slate-800 dark:text-slate-100
+                       hover:bg-slate-300 dark:hover:bg-slate-500
+                       transition"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="px-5 py-2 rounded-lg
+                       bg-teal-600 hover:bg-teal-700
+                       text-white font-semibold
+                       shadow-sm transition"
+            >
+                Guardar mascota
             </button>
+
         </div>
 
     </form>
 
 </div>
-
 @endsection

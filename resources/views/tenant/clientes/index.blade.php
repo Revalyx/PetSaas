@@ -1,105 +1,174 @@
 @extends('layouts.tenant')
 
 @section('content')
-<div class="p-6" x-data="{ deleteId: null, openModal: false }">
+<div
+    class="p-6"
+    x-data="{
+        search: '',
+        deleteId: null,
+        openModal: false,
+        clients: @js($clientes->map(fn($c) => [
+            'id' => $c->id,
+            'nombre' => $c->nombre,
+            'apellidos' => $c->apellidos,
+            'telefono' => $c->telefono,
+            'email' => $c->email,
+        ])),
+        get filtered() {
+            if (this.search === '') return this.clients
 
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold">Clientes</h1>
+            const q = this.search.toLowerCase()
+            return this.clients.filter(c =>
+                (`${c.nombre} ${c.apellidos} ${c.telefono ?? ''} ${c.email ?? ''}`)
+                    .toLowerCase()
+                    .includes(q)
+            )
+        }
+    }"
+>
 
-        <a href="{{ route('tenant.clientes.create') }}"
-           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-           Añadir cliente
-        </a>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
-
-        @if($clientes->isEmpty())
-            <p class="text-gray-500">No hay clientes registrados aún.</p>
-        @else
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="border-b border-gray-300 dark:border-gray-700">
-                        <th class="pb-3">Nombre</th>
-                        <th class="pb-3">Apellidos</th>
-                        <th class="pb-3">Teléfono</th>
-                        <th class="pb-3">Email</th>
-                        <th class="pb-3 text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach($clientes as $c)
-                    <tr class="border-t border-gray-300 dark:border-gray-700">
-                        <td class="py-3 px-2">{{ $c->nombre }}</td>
-                        <td class="py-3 px-2">{{ $c->apellidos }}</td>
-                        <td class="py-3 px-2">{{ $c->telefono ?? '-' }}</td>
-                        <td class="py-3 px-2">{{ $c->email ?? '-' }}</td>
-
-                        <td class="py-3 px-2 text-right">
-
-                            <!-- Botón Editar -->
-                            <a href="{{ route('tenant.clientes.edit', $c->id) }}"
-                               class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm shadow mr-2">
-                                Editar
-                            </a>
-
-                            <!-- Botón Borrar → abre modal -->
-                            <button
-                                @click="deleteId = {{ $c->id }}; openModal = true;"
-                                class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm shadow">
-                                Borrar
-                            </button>
-
-                        </td>
-                    </tr>
-                    @endforeach
-
-                </tbody>
-            </table>
-        @endif
-    </div>
-
-
-    <!-- ========================================================= -->
-    <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
-    <!-- ========================================================= -->
-    <div
-        x-show="openModal"
-        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        x-transition
-    >
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-96"
-             @click.away="openModal = false">
-
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                Confirmar eliminación
-            </h2>
-
-            <p class="text-gray-600 dark:text-gray-300 mb-6">
-                ¿Está seguro de que desea eliminar este cliente?  
-                Esta acción no se puede deshacer.
+    <!-- HEADER -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                Clientes
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+                Gestión y búsqueda de clientes registrados
             </p>
+        </div>
 
-            <div class="flex justify-end space-x-3">
+        <div class="flex gap-3 w-full sm:w-auto">
+            <!-- BUSCADOR -->
+            <div class="relative w-full sm:w-72">
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Buscar cliente…"
+                    class="w-full pl-10 pr-10 py-2 rounded-lg
+                           bg-white dark:bg-slate-700
+                           border border-slate-300 dark:border-slate-600
+                           text-slate-800 dark:text-slate-100
+                           placeholder-slate-400
+                           focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+
+                <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
 
                 <button
-                    class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-100 rounded hover:bg-gray-400"
-                    @click="openModal = false">
+                    x-show="search !== ''"
+                    @click="search = ''"
+                    class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <a
+                href="{{ route('tenant.clientes.create') }}"
+                class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow-sm transition whitespace-nowrap"
+            >
+                Añadir cliente
+            </a>
+        </div>
+    </div>
+
+    <!-- CONTADOR -->
+    <div class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+        Mostrando
+        <span class="font-semibold text-slate-700 dark:text-slate-200" x-text="filtered.length"></span>
+        clientes
+    </div>
+
+    <!-- CARD -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 p-6">
+
+        <!-- TABLA -->
+        <div class="overflow-x-auto" x-show="filtered.length > 0">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
+                        <th class="pb-3 font-semibold">Nombre</th>
+                        <th class="pb-3 font-semibold">Apellidos</th>
+                        <th class="pb-3 font-semibold">Teléfono</th>
+                        <th class="pb-3 font-semibold">Email</th>
+                        <th class="pb-3 text-right font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template x-for="c in filtered" :key="c.id">
+                        <tr class="border-t border-slate-200 dark:border-slate-700
+                                   hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                            <td class="py-3 px-2 font-medium text-slate-800 dark:text-slate-100" x-text="c.nombre"></td>
+                            <td class="py-3 px-2 text-slate-700 dark:text-slate-300" x-text="c.apellidos"></td>
+                            <td class="py-3 px-2 text-slate-700 dark:text-slate-300" x-text="c.telefono ?? '-'"></td>
+                            <td class="py-3 px-2 text-slate-700 dark:text-slate-300" x-text="c.email ?? '-'"></td>
+
+                            <td class="py-3 px-2 text-right space-x-2">
+                                <a
+                                    :href="`{{ url('tenant/clientes') }}/${c.id}/editar`"
+                                    class="inline-flex items-center bg-amber-500 hover:bg-amber-600
+                                           text-white px-3 py-1.5 rounded-md text-xs shadow-sm transition"
+                                >
+                                    Editar
+                                </a>
+
+                                <button
+                                    @click="deleteId = c.id; openModal = true"
+                                    class="inline-flex items-center bg-red-600 hover:bg-red-700
+                                           text-white px-3 py-1.5 rounded-md text-xs shadow-sm transition"
+                                >
+                                    Borrar
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SIN RESULTADOS -->
+        <div x-show="filtered.length === 0"
+             class="text-center py-10 text-slate-500 dark:text-slate-400">
+            No se encontraron clientes que coincidan con la búsqueda.
+        </div>
+    </div>
+
+    <!-- MODAL BORRADO -->
+    <div x-show="openModal"
+         class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+         x-transition>
+        <div
+            class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md
+                   border border-slate-200 dark:border-slate-700"
+            @click.away="openModal = false"
+        >
+            <h2 class="text-xl font-bold mb-4">Confirmar eliminación</h2>
+
+            <p class="text-slate-600 dark:text-slate-300 mb-6">
+                ¿Está seguro de que desea eliminar este cliente?
+                <br>
+                <span class="font-semibold text-red-600 dark:text-red-400">
+                    Esta acción no se puede deshacer.
+                </span>
+            </p>
+
+            <div class="flex justify-end gap-3">
+                <button
+                    class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-600"
+                    @click="openModal = false"
+                >
                     Cancelar
                 </button>
 
-                <form method="POST"
-                      :action="'{{ url('tenant/clientes') }}/' + deleteId">
+                <form method="POST" :action="`{{ url('tenant/clientes') }}/${deleteId}`">
                     @csrf
                     @method('DELETE')
-
-                    <button
-                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    <button class="px-4 py-2 rounded-lg bg-red-600 text-white">
                         Eliminar
                     </button>
                 </form>
-
             </div>
         </div>
     </div>

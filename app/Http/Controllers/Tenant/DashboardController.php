@@ -21,11 +21,20 @@ class DashboardController extends Controller
         $citas_hoy = Appointment::whereDate('date', Carbon::today())->count();
 
         // PRÓXIMAS CITAS
-        $proximas_citas = Appointment::whereDate('date', '>=', Carbon::today())
-            ->orderBy('date')
-            ->orderBy('start_time')
-            ->take(5)
-            ->get();
+        $now = Carbon::now();
+
+$proximas_citas = Appointment::where(function ($q) use ($now) {
+        $q->where('date', '>', $now->toDateString())
+          ->orWhere(function ($q2) use ($now) {
+              $q2->whereDate('date', $now->toDateString())
+                 ->where('start_time', '>', $now->toTimeString());
+          });
+    })
+    ->orderBy('date')
+    ->orderBy('start_time')
+    ->take(5)
+    ->get();
+
 
         // CLIENTE MÁS ACTIVO
         $cliente_top = Cliente::select('clientes.*')
@@ -83,13 +92,15 @@ for ($i = 0; $i < 6; $i++) {
             $datos_mes[] = Appointment::whereDate('date', $date)->count();
         }
 
-        // ----------------------------
-        // 🔥 HEATMAP DE HORAS
-        // ----------------------------
-        $horas = [];
-        for ($h = 8; $h <= 20; $h++) {
-            $horas[$h] = Appointment::where('start_time', 'like', sprintf('%02d', $h) . ':%')->count();
-        }
+        // 🔥 HEATMAP DE HORAS (HOY)
+$horas = [];
+
+for ($h = 8; $h <= 20; $h++) {
+    $horas[$h] = Appointment::whereDate('date', Carbon::today())
+        ->where('start_time', 'like', sprintf('%02d', $h) . ':%')
+        ->count();
+}
+
 
         return view('tenant.dashboard', compact(
             'clientes_count',

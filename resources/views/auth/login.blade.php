@@ -1,145 +1,144 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full" >
+<html lang="es" class="h-full bg-gradient-to-br from-teal-50 via-white to-teal-100">
 <head>
     <meta charset="UTF-8">
-    <title>Login - PetSaaS</title>
+    <title>Acceso · ARIS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Tailwind -->
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Heroicons -->
-    <script src="https://unpkg.com/heroicons@2.0.18/dist/heroicons.js"></script>
-
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+    <!-- Tailwind config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                    }
+                }
+            }
         }
-        .fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-    </style>
+    </script>
 </head>
 
-<body class="h-full">
+<body class="h-full font-sans">
 
-<div class="min-h-screen flex">
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
 
-    <!-- ============================
-         PANEL IZQUIERDO (imagen)
-         ============================ -->
-    <div class="hidden md:flex w-1/2 bg-gradient-to-br from-orange-400 via-amber-300 to-yellow-200 
-                items-center justify-center relative overflow-hidden">
+    <!-- CARD PRINCIPAL -->
+    <div class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden">
 
-        <img src="https://cdn-icons-png.flaticon.com/512/194/194279.png"
-             class="w-72 opacity-80 fade-in" 
-             style="animation-delay: .3s">
+        <div class="grid grid-cols-1 md:grid-cols-2">
 
-        <div class="absolute bottom-6 text-white text-sm opacity-80">
-            © {{ date('Y') }} PetSaaS — Gestión cloud para peluquerías caninas
-        </div>
-    </div>
+            <!-- =====================
+                 IZQUIERDA · LOGIN
+                 ===================== -->
+            <div class="p-8 md:p-14">
 
+                <!-- BRAND -->
+                <div class="mb-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/194/194279.png"
+                             alt="ARIS"
+                             class="w-9 h-9">
 
-    <!-- ============================
-         PANEL DERECHO (formulario)
-         ============================ -->
-    <div class="flex w-full md:w-1/2 bg-gray-50 dark:bg-gray-900 
-                items-center justify-center p-10">
+                        <span class="text-xl font-extrabold text-slate-800">
+                            ARIS
+                        </span>
+                    </div>
 
-        <div class="w-full max-w-md fade-in bg-white dark:bg-gray-800 
-                    shadow-xl rounded-2xl p-10">
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">
+                        Bienvenido de nuevo
+                    </h1>
 
-            <!-- Logo -->
-            <div class="flex justify-center mb-5">
-                <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
-                     class="w-16 h-16 opacity-90">
+                    <p class="text-slate-500">
+                        Gestione su negocio de forma sencilla.
+                    </p>
+                </div>
+
+                <!-- ERROR -->
+                @if($errors->any())
+                    <div class="mb-6 p-3 rounded-lg bg-red-100 text-red-700 text-sm border border-red-200">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
+                <!-- FORM -->
+                <form method="POST" action="/login" class="space-y-6">
+                    @csrf
+
+                    <!-- EMAIL -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">
+                            Email
+                        </label>
+                        <input type="email" name="email" required
+                            class="w-full px-4 py-3 rounded-lg
+                                   border border-slate-300
+                                   placeholder-slate-400
+                                   focus:ring-2 focus:ring-teal-500
+                                   focus:border-teal-500 transition"
+                            placeholder="usuario@empresa.com">
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">
+                            Contraseña
+                        </label>
+                        <input type="password" name="password" required
+                            class="w-full px-4 py-3 rounded-lg
+                                   border border-slate-300
+                                   placeholder-slate-400
+                                   focus:ring-2 focus:ring-teal-500
+                                   focus:border-teal-500 transition"
+                            placeholder="••••••••">
+                    </div>
+
+                    <!-- OPCIONES -->
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center gap-2 text-slate-600">
+                            <input type="checkbox" name="remember"
+                                   class="rounded border-slate-400">
+                            Recuérdame
+                        </label>
+
+                        <a href="#" class="text-teal-600 hover:underline">
+                            ¿Olvidó su contraseña?
+                        </a>
+                    </div>
+
+                    <!-- BOTÓN -->
+                    <button type="submit"
+                        class="w-full py-3 rounded-lg
+                               bg-teal-600 hover:bg-teal-700
+                               text-white font-semibold
+                               shadow-md transition">
+                        Entrar
+                    </button>
+                </form>
+
+                <div class="mt-10 text-xs text-slate-400">
+                    © {{ date('Y') }} ARIS
+                </div>
             </div>
 
-            <h2 class="text-3xl font-extrabold text-center 
-                       text-gray-800 dark:text-white mb-6">
-                Bienvenido a PetSaaS
-            </h2>
+            <!-- =====================
+                 DERECHA · IMAGEN
+                 ===================== -->
+            <div class="relative hidden md:block">
+                <img src="https://img.hobbyfarms.com/AdobeStock_574616417-scaled.jpeg"
+     alt="Cuidado de mascotas"
+     class="absolute inset-0 w-full h-full object-cover"
+     style="object-position: 50% 35%;">
 
-            <!-- Error -->
-            @if($errors->any())
-                <div class="mb-4 p-3 bg-red-100 text-red-700 border 
-                            border-red-300 rounded-lg text-sm">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-
-            <!-- FORM -->
-            <form method="POST" action="/login" class="space-y-5">
-                @csrf
-
-                <!-- EMAIL -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Email
-                    </label>
-                    <div class="relative">
-                        <input type="email" name="email" required
-                            class="w-full pl-11 pr-4 py-3 bg-gray-100 dark:bg-gray-700
-                                   border border-gray-300 dark:border-gray-600 
-                                   rounded-lg focus:ring-2 focus:ring-orange-500 
-                                   focus:border-orange-500 dark:text-white transition"
-                            placeholder="usuario@empresa.com">
-                        <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400 dark:text-gray-300" 
-                             xmlns="https://www.w3.org/2000/svg" fill="none" 
-                             viewBox="0 0 24 24" stroke="currentColor">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                             d="M16.5 12c0 1.657-1.343 3-3 3h-3a3 3 0 010-6h3c1.657 0 3 1.343 3 3zm-5.25 0h.008v.008h-.008V12zm0 0h.008v.008h-.008V12z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- PASSWORD -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Contraseña
-                    </label>
-                    <div class="relative">
-                        <input type="password" name="password" required
-                            class="w-full pl-11 pr-4 py-3 bg-gray-100 dark:bg-gray-700
-                                   border border-gray-300 dark:border-gray-600 
-                                   rounded-lg focus:ring-2 focus:ring-orange-500 
-                                   focus:border-orange-500 dark:text-white transition"
-                            placeholder="••••••••">
-                        <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400 dark:text-gray-300" 
-                             xmlns="http://www.w3.org/2000/svg" fill="none" 
-                             viewBox="0 0 24 24" stroke="currentColor">
-                             <path stroke-linecap="round" stroke-linejoin="round" 
-                                   stroke-width="1.5"
-                                   d="M3 8.25c0-.621.504-1.125 1.125-1.125h15.75c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 013 18V8.25z" />
-                             <path stroke-linecap="round" stroke-linejoin="round" 
-                                   stroke-width="1.5"
-                                   d="M9 12.75h.008v.008H9v-.008zm3 0h.008v.008H12v-.008zm3 0h.008v.008H15v-.008z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- REMEMBER -->
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center gap-2 text-gray-600 dark:text-gray-300 text-sm">
-                        <input type="checkbox" name="remember" class="rounded border-gray-400">
-                        Recuérdame
-                    </label>
-
-                    <a href="#" class="text-sm text-orange-600 hover:underline">
-                        ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
-
-                <!-- BOTÓN -->
-                <button type="submit"
-                    class="w-full py-3 bg-orange-600 hover:bg-orange-700 
-                           text-white font-semibold rounded-lg shadow-lg
-                           transform hover:scale-[1.02] transition">
-                    Entrar
-                </button>
-
-            </form>
+            </div>
 
         </div>
     </div>

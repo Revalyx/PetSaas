@@ -23,7 +23,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // HOME PUBLICA
 // ========================================================
 Route::get('/', function () {
-    return 'Página pública. Ve a /login';
+    return redirect()->route('login');
 });
 
 // ========================================================
