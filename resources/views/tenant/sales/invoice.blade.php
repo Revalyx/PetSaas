@@ -8,30 +8,43 @@
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
-            color: #111;
+            color: #0f172a;
+            background: #ffffff;
         }
 
         .container {
             width: 100%;
         }
 
+        /* ====== ARIS COLORS ====== */
+        .aris-primary {
+            color: #14b8a6;
+        }
+
+        .aris-muted {
+            color: #64748b;
+        }
+
+        .aris-border {
+            border-color: #e2e8f0;
+        }
+
+        /* ====== HEADER ====== */
         h1 {
-            font-size: 20px;
+            font-size: 22px;
             margin: 0;
+            font-weight: bold;
         }
 
         h2 {
             font-size: 14px;
             margin-bottom: 6px;
-        }
-
-        .muted {
-            color: #666;
+            color: #0f172a;
         }
 
         .row {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             clear: both;
         }
 
@@ -44,35 +57,45 @@
             text-align: right;
         }
 
+        /* ====== BOX ====== */
         .box {
-            border: 1px solid #ddd;
-            padding: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
             margin-bottom: 20px;
+            background: #f8fafc;
         }
 
+        /* ====== TABLE ====== */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
         }
 
-        th, td {
-            border-bottom: 1px solid #ddd;
-            padding: 8px 6px;
-        }
-
         th {
-            background: #f2f2f2;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 8px 6px;
             text-align: left;
             font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #334155;
+        }
+
+        td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 6px;
+            font-size: 12px;
         }
 
         td.right {
             text-align: right;
         }
 
+        /* ====== TOTALS ====== */
         .totals {
-            margin-top: 20px;
+            margin-top: 24px;
             width: 100%;
         }
 
@@ -82,7 +105,7 @@
 
         .totals .label {
             text-align: right;
-            color: #555;
+            color: #475569;
         }
 
         .totals .value {
@@ -90,15 +113,17 @@
             font-weight: bold;
         }
 
-        .total-final {
+        .total-final td {
             font-size: 14px;
-            border-top: 2px solid #000;
+            border-top: 2px solid #0f172a;
+            padding-top: 10px;
         }
 
+        /* ====== FOOTER ====== */
         .footer {
             margin-top: 40px;
             font-size: 10px;
-            color: #777;
+            color: #64748b;
             text-align: center;
         }
 
@@ -116,19 +141,19 @@
     {{-- CABECERA --}}
     <div class="row clearfix">
         <div class="col">
-            <h1>FACTURA</h1>
-            <div class="muted">
+            <h1 class="aris-primary">FACTURA</h1>
+            <div class="aris-muted">
                 Nº {{ $sale->id }}<br>
                 Fecha: {{ $sale->closed_at->format('d/m/Y H:i') }}
             </div>
         </div>
 
         <div class="col right">
-            {{-- LOGO OPCIONAL --}}
-            {{-- <img src="{{ public_path('logo.png') }}" height="40"> --}}
             <strong>{{ $tenant->name }}</strong><br>
-            {{ $tenant->address ?? '' }}<br>
-            CIF: {{ $tenant->cif ?? '—' }}
+            <span class="aris-muted">
+                {{ $tenant->address ?? '' }}<br>
+                CIF: {{ $tenant->cif ?? '—' }}
+            </span>
         </div>
     </div>
 
@@ -138,9 +163,11 @@
 
         @if ($sale->customer)
             <strong>{{ $sale->customer->nombre }}</strong><br>
-            {{ $sale->customer->direccion ?? '' }}
+            <span class="aris-muted">
+                {{ $sale->customer->direccion ?? '' }}
+            </span>
         @else
-            Cliente genérico
+            <span class="aris-muted">Cliente genérico</span>
         @endif
     </div>
 

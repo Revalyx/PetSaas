@@ -17,29 +17,29 @@ class SaleController extends Controller
      * LISTADO DE VENTAS ABIERTAS + BUSCADOR
      */
     public function index(Request $request)
-    {
-        $query = Sale::with('customer')
-            ->where('status', 'open');
+{
+    $query = Sale::with('customer');
 
-        if ($request->filled('q')) {
-            $q = trim($request->q);
+    if ($request->filled('q')) {
+        $q = trim($request->q);
 
-            $query->where(function ($sub) use ($q) {
-                $sub->where('id', $q)
-                    ->orWhereHas('customer', function ($c) use ($q) {
-                        $c->where('nombre', 'like', "%{$q}%")
-                          ->orWhere('apellidos', 'like', "%{$q}%")
-                          ->orWhere('telefono', 'like', "%{$q}%");
-                    });
-            });
-        }
-
-        $sales = $query
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('tenant.sales.index', compact('sales'));
+        $query->where(function ($sub) use ($q) {
+            $sub->where('id', $q)
+                ->orWhereHas('customer', function ($c) use ($q) {
+                    $c->where('nombre', 'like', "%{$q}%")
+                      ->orWhere('apellidos', 'like', "%{$q}%")
+                      ->orWhere('telefono', 'like', "%{$q}%");
+                });
+        });
     }
+
+    $sales = $query
+        ->orderByDesc('created_at')
+        ->get();
+
+    return view('tenant.sales.index', compact('sales'));
+}
+
 
     /**
      * CREAR NUEVA VENTA
@@ -170,7 +170,7 @@ public function invoice($saleId)
         });
 
         return redirect()
-    ->route('tenant.sales.show', $sale->id)
+    ->route('tenant.sales.index', $sale->id)
     ->with('success', 'Venta cerrada correctamente');
 
     }
