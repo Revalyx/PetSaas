@@ -4,22 +4,36 @@
 
 @section('content')
 
-<div class="bg-gray-900/20 dark:bg-gray-800/20 p-8 rounded-xl shadow-xl">
+<div class="bg-white dark:bg-slate-800
+            p-8 rounded-2xl shadow-xl
+            border border-slate-200 dark:border-slate-700">
 
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-white">Citas de Peluquería</h2>
+    {{-- HEADER --}}
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <h2 class="text-3xl font-extrabold text-slate-800 dark:text-slate-100">
+            Citas de Peluquería
+        </h2>
 
         <a href="{{ route('tenant.appointments.create') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition">
-            ➕ Nueva Cita
+           class="inline-flex items-center gap-2
+                  px-4 py-2 rounded-xl
+                  bg-teal-600 hover:bg-teal-700
+                  text-white font-semibold shadow transition">
+            ➕ Nueva cita
         </a>
     </div>
 
-    <div class="overflow-hidden rounded-xl border border-gray-700/50 shadow-xl">
-        <table class="w-full text-left bg-gray-900/10 dark:bg-gray-800/10">
-            
+    {{-- TABLA --}}
+    <div class="overflow-x-auto rounded-xl
+                border border-slate-200 dark:border-slate-700">
+
+        <table class="w-full text-sm text-left
+                      bg-white dark:bg-slate-800">
+
             {{-- CABECERA --}}
-            <thead class="bg-gray-800 text-gray-200 uppercase text-xs tracking-wider">
+            <thead class="bg-slate-100 dark:bg-slate-700
+                          text-slate-600 dark:text-slate-300
+                          uppercase text-xs tracking-wider">
                 <tr>
                     <th class="px-4 py-3">Fecha</th>
                     <th class="px-4 py-3">Hora</th>
@@ -32,147 +46,167 @@
             </thead>
 
             {{-- CUERPO --}}
-            <tbody class="text-white text-sm">
-                @foreach($appointments as $a)
-                    <tr class="border-b border-gray-700/40 hover:bg-gray-700/20 transition">
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
 
-                        {{-- FECHA --}}
-                        <td class="px-4 py-3 font-medium">
-                            {{ $a->date->format('d/m/Y') }}
-                        </td>
+            @foreach($appointments as $a)
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
 
-                        {{-- HORA --}}
-                        <td class="px-4 py-3">
-                            {{ $a->start_time ?: '—' }}
-                            @if($a->end_time)
-                                - {{ $a->end_time }}
-                            @endif
-                        </td>
+                    {{-- FECHA --}}
+                    <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-100">
+                        {{ $a->date->format('d/m/Y') }}
+                    </td>
 
-                        {{-- CLIENTE --}}
-                        <td class="px-4 py-3">
-                            {{ $a->customer?->nombre ?? '—' }} {{ $a->customer?->apellidos ?? '' }}
-                        </td>
+                    {{-- HORA --}}
+                    <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        {{ $a->start_time ?: '—' }}
+                        @if($a->end_time)
+                            – {{ $a->end_time }}
+                        @endif
+                    </td>
 
-                        {{-- MASCOTA --}}
-                        <td class="px-4 py-3">
-                            {{ $a->pet?->nombre ?? '—' }}
-                        </td>
+                    {{-- CLIENTE --}}
+                    <td class="px-4 py-3">
+                        {{ $a->customer?->nombre ?? '—' }}
+                        {{ $a->customer?->apellidos ?? '' }}
+                    </td>
 
-                        {{-- TIPO --}}
-                        @php
-                            $typeColors = [
-                                'muda'      => 'bg-green-600',
-                                'corte'     => 'bg-red-600',
-                                'arreglo'   => 'bg-pink-500',
-                                'gato'      => 'bg-yellow-400 text-black',
-                                'cancelar'  => 'bg-blue-600',
-                                'dificiles' => 'bg-gray-500',
-                            ];
-                        @endphp
+                    {{-- MASCOTA --}}
+                    <td class="px-4 py-3">
+                        {{ $a->pet?->nombre ?? '—' }}
+                    </td>
 
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded-lg text-xs font-semibold {{ $typeColors[$a->type] ?? 'bg-gray-600' }}">
-                                {{ ucfirst($a->type) }}
-                            </span>
-                        </td>
+                    {{-- TIPO --}}
+                    @php
+                        $typeColors = [
+                            'muda'      => 'bg-green-600',
+                            'corte'     => 'bg-red-600',
+                            'arreglo'   => 'bg-pink-500',
+                            'gato'      => 'bg-yellow-400 text-black',
+                            'cancelled' => 'bg-blue-600',
+                            'dificiles' => 'bg-slate-500',
+                        ];
+                    @endphp
 
-                        {{-- ESTADO --}}
-                        @php
-                            $labels = [
-                                'pending'   => 'Pendiente',
-                                'confirmed' => 'Confirmada',
-                                'cancelled' => 'Cancelada',
-                                'completed' => 'Completada',
-                            ];
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center
+                                     px-3 py-1 rounded-full
+                                     text-xs font-semibold text-white
+                                     {{ $typeColors[$a->type] ?? 'bg-slate-500' }}">
+                            {{ ucfirst($a->type) }}
+                        </span>
+                    </td>
 
-                            $colors = [
-                                'pending'   => 'bg-transparent text-gray-300 border border-gray-600',
-                                'confirmed' => 'bg-transparent text-gray-300 border border-gray-600',
-                                'completed' => 'bg-transparent text-gray-300 border border-gray-600',
-                                'cancelled' => 'bg-blue-600 text-white',
-                            ];
+                    {{-- ESTADO --}}
+                    @php
+                        $labels = [
+                            'pending'   => 'Pendiente',
+                            'confirmed' => 'Confirmada',
+                            'completed' => 'Completada',
+                            'cancelled' => 'Cancelada',
+                        ];
 
-                            $estado = $a->status ?? 'pending';
-                        @endphp
+                        $colors = [
+                            'pending'   => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+                            'confirmed' => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+                            'completed' => 'bg-green-600 text-white',
+                            'cancelled' => 'bg-blue-600 text-white',
+                        ];
 
-                        <td class="px-4 py-3">
-                            <span class="px-3 py-1 text-white rounded-lg text-xs font-semibold {{ $colors[$estado] ?? 'bg-gray-500' }}">
-                                {{ $labels[$estado] ?? $estado }}
-                            </span>
-                        </td>
+                        $estado = $a->status ?? 'pending';
+                    @endphp
 
-                        {{-- ACCIONES --}}
-                        <td class="px-4 py-3 flex justify-center gap-3">
+                    <td class="px-4 py-3">
+                        <span class="inline-flex px-3 py-1 rounded-full
+                                     text-xs font-semibold
+                                     {{ $colors[$estado] ?? 'bg-slate-400 text-white' }}">
+                            {{ $labels[$estado] ?? ucfirst($estado) }}
+                        </span>
+                    </td>
 
-                            {{-- EDITAR --}}
+                    {{-- ACCIONES --}}
+                    <td class="px-4 py-3">
+                        <div class="flex justify-center gap-2">
+
                             <a href="{{ route('tenant.appointments.edit', $a->id) }}"
-                               class="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow">
-                                ✏️ Editar
+                               class="w-9 h-9 flex items-center justify-center
+                                      rounded-lg bg-indigo-600 hover:bg-indigo-700
+                                      text-white transition shadow">
+                                ✏️
                             </a>
 
-                            {{-- ELIMINAR → abre modal --}}
                             <button
                                 onclick="openDeleteModal({{ $a->id }})"
-                                class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow">
+                                class="w-9 h-9 flex items-center justify-center
+                                       rounded-lg bg-red-600 hover:bg-red-700
+                                       text-white transition shadow">
                                 🗑️
                             </button>
 
-                        </td>
+                        </div>
+                    </td>
 
-                    </tr>
-                @endforeach
+                </tr>
+            @endforeach
+
             </tbody>
-
         </table>
     </div>
-
 </div>
 
-
-{{-- ============================= --}}
-{{-- MODAL DE CONFIRMACIÓN BORRADO --}}
-{{-- ============================= --}}
+{{-- MODAL DELETE --}}
 <div id="modal-delete"
-     class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden justify-center items-center z-50">
-    
-    <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-full max-w-md">
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm
+            hidden justify-center items-center z-50">
 
-        <h2 class="text-xl font-bold mb-4">Confirmar eliminación</h2>
-        <p class="text-gray-300 mb-6">¿Seguro que deseas eliminar esta cita?</p>
+    <div class="bg-white dark:bg-slate-800
+                text-slate-800 dark:text-slate-100
+                p-6 rounded-2xl shadow-xl w-full max-w-md">
+
+        <h2 class="text-xl font-bold mb-3">
+            Confirmar eliminación
+        </h2>
+
+        <p class="text-slate-600 dark:text-slate-300 mb-6">
+            ¿Seguro que deseas eliminar esta cita?
+        </p>
 
         <div class="flex justify-end gap-3">
+
             <button onclick="closeDeleteModal()"
-                    class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg">
+                    class="px-4 py-2 rounded-xl
+                           bg-slate-200 hover:bg-slate-300
+                           dark:bg-slate-700 dark:hover:bg-slate-600
+                           transition">
                 Cancelar
             </button>
 
             <form method="POST" id="delete-form">
                 @csrf
                 @method('DELETE')
-                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
+                <button
+                    class="px-4 py-2 rounded-xl
+                           bg-red-600 hover:bg-red-700
+                           text-white font-semibold transition">
                     Eliminar
                 </button>
             </form>
-        </div>
 
+        </div>
     </div>
 </div>
 
-
-{{-- SCRIPT MODAL --}}
 <script>
-    function openDeleteModal(id) {
-        document.getElementById('delete-form').action =
-            `/tenant/appointments/${id}`;
-        document.getElementById('modal-delete').classList.remove('hidden');
-        document.getElementById('modal-delete').classList.add('flex');
-    }
+function openDeleteModal(id) {
+    document.getElementById('delete-form').action =
+        `/tenant/appointments/${id}`;
+    document.getElementById('modal-delete').classList.remove('hidden');
+    document.getElementById('modal-delete').classList.add('flex');
+}
 
-    function closeDeleteModal() {
-        document.getElementById('modal-delete').classList.add('hidden');
-        document.getElementById('modal-delete').classList.remove('flex');
-    }
+function closeDeleteModal() {
+    document.getElementById('modal-delete').classList.add('hidden');
+    document.getElementById('modal-delete').classList.remove('flex');
+}
 </script>
 
 @endsection

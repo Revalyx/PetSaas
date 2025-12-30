@@ -3,580 +3,349 @@
 @section('title', 'Calendario de Citas')
 
 @section('content')
-
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<!-- FullCalendar -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <style>
-/* ================================================================
-   ESTILO GOOGLE CALENDAR - DARK MODE (CORREGIDO)
-================================================================ */
+/* =====================================================
+   PALETA ARIS
+===================================================== */
+:root {
+    --aris-bg-light: #f8fafc;
+    --aris-bg-dark: #020617;
+    --aris-bg-dark-2: #0f172a;
 
-.fc { font-family: "Inter", sans-serif; }
+    --aris-primary: #14b8a6;        /* TEAL ARIS */
+    --aris-primary-hover: #0d9488;
 
-/* ======================
-   TOOLBAR
-====================== */
-
-.fc-toolbar-title {
-    font-size: 1.45rem !important;
-    font-weight: 600 !important;
-    color: #fff !important;
+    --aris-border: #1e293b;
+    --aris-text-soft: #94a3b8;
+    --aris-text-main: #e5e7eb;
 }
 
-.fc-button {
-    border-radius: 6px !important;
-    background: #e7e8ea !important;
-    border: none !important;
-    color: #333 !important;
-    padding: 6px 12px !important;
-    font-weight: 500 !important;
+
+/* =====================================================
+   CONTENEDOR GENERAL
+===================================================== */
+.calendar-box {
+    border-radius: 22px;
+    padding: 26px;
+    background: var(--aris-bg-light);
+    box-shadow: 0 20px 40px rgba(0,0,0,.08);
+}
+.dark .calendar-box {
+    background: linear-gradient(180deg,var(--aris-bg-dark-2),var(--aris-bg-dark));
 }
 
-.dark .fc-button {
-    background: #2f3642 !important;
-    color: #e5e5e5 !important;
+/* =====================================================
+   TÍTULO
+===================================================== */
+.calendar-title {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--aris-primary);
+}
+.dark .calendar-title {
+    color: #ffffff;
 }
 
-.fc-button:hover { background:#d6d6d6 !important; }
-.dark .fc-button:hover { background:#3d4655 !important; }
-
-/* ======================
-   GRID / DAYS
-====================== */
-
-.dark .fc-daygrid-day-frame { border-color:#2c3342 !important; }
-.dark .fc-theme-standard td,
-.dark .fc-theme-standard th { border-color:#394457 !important; }
-
-.fc .fc-daygrid-day-number {
-    color:#e5e5e5 !important;
-    font-weight:600;
-}
-
-.fc-day-today {
-    background:rgba(66,133,244,0.18) !important;
-    border-radius:8px;
-}
-
-/* ======================
-   EVENTOS POR TIPO
-====================== */
-
-.fc-event.muda      { background-color:#34A853 !important; border-color:#34A853 !important; }
-.fc-event.corte     { background-color:#EA4335 !important; border-color:#EA4335 !important; }
-.fc-event.arreglo   { background-color:#FF4FB2 !important; border-color:#FF4FB2 !important; }
-.fc-event.gato      { background-color:#FABB05 !important; border-color:#FABB05 !important; color:#000 !important; }
-.fc-event.cancelled { background-color:#4285F4 !important; border-color:#4285F4 !important; }
-.fc-event.dificiles { background-color:#9AA0A6 !important; border-color:#9AA0A6 !important; }
-
-/* ======================
-   EVENTOS (TIMEGRID)
-====================== */
-
-.fc-event {
-    border-radius: 8px !important;
-    font-size: 0.88rem !important;
-    font-weight: 500 !important;
-    color: white !important;
-
-    padding: 6px 8px !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.12);
-    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
-
-    backdrop-filter: blur(2px);
-    border-left: 4px solid rgba(255,255,255,0.45) !important;
-}
-
-/* Contenido interno bien centrado */
-.fc-event-main {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
-}
-
-/* Hover elegante, sin romper layout */
-.fc-event:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.08);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
-}
-
-/* Texto */
-.fc-event-title {
-    white-space: normal !important;
-    word-break: break-word;
-    line-height: 1.25;
-}
-
-.fc-event-time {
-    font-size: 0.72rem;
-    opacity: 0.85;
-    margin-bottom: 2px;
-}
-
-/* ======================
-   CABECERAS
-====================== */
-
-.fc-col-header-cell {
-    background: rgba(255,255,255,0.04);
-}
-
-.fc-col-header-cell-cushion {
-    font-weight: 600;
-    color: #cbd5e1;
-}
-
-/* ======================
-   LEYENDA
-====================== */
-
-.legend {
-    display:flex;
-    flex-wrap:wrap;
-    gap:14px;
-    align-items:center;
-    margin-top: 8px;
-}
-
-.legend .item {
+/* =====================================================
+   FILTROS
+===================================================== */
+.filter-chip {
     display:flex;
     align-items:center;
-    gap:6px;
-    background:rgba(255,255,255,0.07);
-    padding:6px 12px;
-    border-radius:8px;
-    color:white;
-    border:1px solid rgba(255,255,255,0.1);
+    gap:10px;
+    padding:6px 14px;
+    border-radius:999px;
+    background:white;
+    border:1px solid #e5e7eb;
+    font-size:.9rem;
+    cursor:pointer;
+}
+.dark .filter-chip {
+    background: var(--aris-bg-dark);
+    border-color: var(--aris-border);
+    color:#e5e7eb;
 }
 
-.legend .sw {
-    width:14px;
-    height:14px;
+.filter-dot {
+    width:12px;
+    height:12px;
     border-radius:4px;
 }
 
-/* ======================
-   MODALES
-====================== */
+/* =====================================================
+   BOTONES ARIS
+===================================================== */
+.cal-btn {
+    padding:8px 16px;
+    border-radius:10px;
+    background:#e5e7eb;
+    font-weight:500;
+}
+.dark .cal-btn {
+    background: var(--aris-bg-dark);
+    color:#e5e7eb;
+}
 
+.cal-btn-primary {
+    background: var(--aris-primary);
+    color:#1f2937;
+    font-weight:600;
+}
+.cal-btn-primary:hover {
+    background: var(--aris-primary-hover);
+}
+
+/* =====================================================
+   FULLCALENDAR BASE
+===================================================== */
+.fc-toolbar { display:none; }
+
+.fc {
+    background:white;
+    border-radius:16px;
+    padding:14px;
+}
+.dark .fc {
+    background: var(--aris-bg-dark);
+    color:#e5e7eb;
+}
+
+.fc-event {
+    border-radius:8px!important;
+    font-size:.85rem;
+    padding:4px 6px;
+}
+
+/* =====================================================
+   COLORES POR TIPO (ARIS)
+===================================================== */
+.fc-event.muda       { background:#22c55e!important; }
+.fc-event.corte      { background:#ef4444!important; }
+.fc-event.arreglo    { background:#ec4899!important; }
+.fc-event.gato       { background:#facc15!important; color:black!important; }
+.fc-event.cancelled  { background:#3b82f6!important; }
+.fc-event.dificiles  { background:#9ca3af!important; }
+
+/* =====================================================
+   EVENTOS CORTOS
+===================================================== */
+.fc-timegrid-event {
+    min-height: 44px !important;
+}
+.fc-timegrid-event-short .fc-event-time {
+    display:none;
+}
+
+/* =====================================================
+   MODAL ARIS
+===================================================== */
 .modal-backdrop {
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,0.45);
+    background:rgba(2,6,23,.75);
     display:none;
     align-items:center;
     justify-content:center;
     z-index:9999;
-    backdrop-filter:blur(3px);
 }
 
 .modal {
-    background:#1f2633;
     width:100%;
-    max-width:620px;
-    padding:0;
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 12px 28px rgba(0,0,0,0.35);
+    max-width:520px;
+    border-radius:22px;
+    background: linear-gradient(180deg,#ffffff,#f8fafc);
+    padding:26px;
+    box-shadow:0 40px 120px rgba(0,0,0,.45);
+    border:1px solid #e5e7eb;
+}
+.dark .modal {
+    background: linear-gradient(180deg,var(--aris-bg-dark-2),var(--aris-bg-dark));
+    border-color: var(--aris-border);
+    color:#e5e7eb;
+}
+
+.modal h3 {
+    font-size:1.5rem;
+    font-weight:700;
+    margin-bottom:14px;
+    color: var(--aris-text-main);
+}
+.dark .modal h3 {
     color:white;
 }
 
-.modal-header {
-    padding:18px 20px;
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.modal-header h3 {
-    font-size:1.30rem;
-    font-weight:600;
-}
-
-.modal-close-btn {
-    font-size:1.6rem;
-    cursor:pointer;
-    color:#ccc;
-}
-.modal-close-btn:hover { color:white; }
-
-.modal-body {
-    padding:18px 20px;
-    font-size:0.95rem;
-}
-
 .modal-row {
-    margin-bottom:14px;
     display:flex;
+    gap:8px;
+    margin-top:10px;
+    font-size:.95rem;
 }
 
 .modal-label {
-    width:115px;
-    color:#8d97a9;
-    font-weight:500;
+    min-width:80px;
+    font-weight:600;
+    color:#475569;
+}
+.dark .modal-label {
+    color: var(--aris-text-soft);
 }
 
-.modal-value { flex:1; }
-
 .modal-footer {
-    padding:14px 20px;
-    border-top:1px solid rgba(255,255,255,0.07);
+    margin-top:24px;
     display:flex;
     justify-content:flex-end;
     gap:10px;
 }
-
-.modal-btn {
-    padding:8px 14px;
-    border-radius:6px;
-    font-weight:500;
-}
-.modal-btn-edit { background:#d6a100; color:black; }
-.modal-btn-delete { background:#dc2626; color:white; }
-.modal-btn-close { background:#4b5563; color:white; }
-.modal-btn:hover { filter:brightness(1.1); }
-
-/* ======================
-   CALENDARIO CONTENEDOR
-====================== */
-
-#calendar {
-    background: linear-gradient(180deg, #1e2533, #161c27);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.04);
-}
-
-/* ======================
-   MODAL DELETE
-====================== */
-
-#modal-delete {
-    display:none;
-}
-
-/* Altura mínima para eventos cortos */
-.fc-timegrid-event {
-    min-height: 48px !important;
-}
-
 </style>
 
+<div class="calendar-box space-y-6">
 
+    <h1 class="calendar-title">Calendario de Citas</h1>
 
-{{-- ================================
-     LISTA FILTROS + HEADER
-================================ --}}
-<div class="space-y-6">
+    {{-- FILTROS --}}
+    <div class="flex flex-wrap gap-3">
+        @php
+            $types = [
+                'muda' => '#22c55e',
+                'corte' => '#ef4444',
+                'arreglo' => '#ec4899',
+                'gato' => '#facc15',
+                'cancelled' => '#3b82f6',
+                'dificiles' => '#9ca3af',
+            ];
+        @endphp
 
-    <div class="bg-gray-100 dark:bg-gray-800/40 p-4 rounded-xl shadow">
-
-        <div class="flex flex-col gap-4">
-
-            <div>
-                <h2 class="text-2xl font-bold text-white">Calendario de Citas</h2>
-
-                <div class="legend mt-3">
-
-                    <label class="item">
-                        <span class="sw" style="background:#34A853"></span>
-                        <input type="checkbox" checked data-type="muda"> Muda
-                    </label>
-
-                    <label class="item">
-                        <span class="sw" style="background:#EA4335"></span>
-                        <input type="checkbox" checked data-type="corte"> Corte
-                    </label>
-
-                    <label class="item">
-                        <span class="sw" style="background:#FF4FB2"></span>
-                        <input type="checkbox" checked data-type="arreglo"> Arreglo
-                    </label>
-
-                    <label class="item">
-                        <span class="sw" style="background:#FABB05"></span>
-                        <input type="checkbox" checked data-type="gato"> Gato
-                    </label>
-
-                    <label class="item">
-                        <span class="sw" style="background:#4285F4"></span>
-                        <input type="checkbox" checked data-type="cancelled"> Canceladas
-                    </label>
-
-                    <label class="item">
-                        <span class="sw" style="background:#9AA0A6"></span>
-                        <input type="checkbox" checked data-type="dificiles"> Difíciles
-                    </label>
-
-                </div>
-            </div>
-
-            <div class="flex flex-wrap gap-3">
-                <button id="btn-today" class="px-3 py-2 rounded bg-gray-200 dark:bg-gray-700">Hoy</button>
-                <button id="btn-month" class="px-3 py-2 rounded bg-gray-200 dark:bg-gray-700">Mensual</button>
-                <button id="btn-week" class="px-3 py-2 rounded bg-gray-200 dark:bg-gray-700">Semanal</button>
-
-                <a href="{{ route('tenant.appointments.create') }}"
-                   class="px-3 py-2 bg-blue-600 text-white rounded">Nueva Cita</a>
-            </div>
-
-        </div>
-
+        @foreach($types as $type => $color)
+        <label class="filter-chip">
+            <span class="filter-dot" style="background:{{ $color }}"></span>
+            <input type="checkbox" checked data-type="{{ $type }}">
+            {{ ucfirst($type) }}
+        </label>
+        @endforeach
     </div>
 
-    <div id="calendar" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4"></div>
+    {{-- CONTROLES --}}
+    <div class="flex gap-3">
+        <button id="btn-day" class="cal-btn">Día</button>
+        <button id="btn-week" class="cal-btn">Semana</button>
+        <button id="btn-month" class="cal-btn">Mes</button>
 
+        <a href="{{ route('tenant.appointments.create') }}"
+           class="cal-btn cal-btn-primary">
+            Nueva cita
+        </a>
+    </div>
+
+    <div id="calendar"></div>
 </div>
 
-
-
-{{-- ====================================================
-     MODAL — DETALLES DE CITA
-==================================================== --}}
+{{-- MODAL --}}
 <div id="modal" class="modal-backdrop">
     <div class="modal">
 
-        <div class="modal-header">
-            <h3 id="modal-title"></h3>
-            <span id="modal-close" class="modal-close-btn">&times;</span>
-        </div>
+        <h3 id="modal-title"></h3>
 
-        <div class="modal-body">
-
-            <div class="modal-row">
-                <div class="modal-label">Cliente:</div>
-                <div id="modal-customer" class="modal-value"></div>
-            </div>
-
-            <div class="modal-row">
-                <div class="modal-label">Mascota:</div>
-                <div id="modal-pet" class="modal-value"></div>
-            </div>
-
-            <div class="modal-row">
-                <div class="modal-label">Tipo:</div>
-                <div id="modal-type" class="modal-value"></div>
-            </div>
-
-            <div class="modal-row">
-                <div class="modal-label">Notas:</div>
-                <div id="modal-notes" class="modal-value"></div>
-            </div>
-
-            <div class="modal-row">
-                <div class="modal-label">Horario:</div>
-                <div id="modal-time" class="modal-value"></div>
-            </div>
-
-        </div>
+        <div class="modal-row"><span class="modal-label">Horario</span><span id="modal-time"></span></div>
+        <div class="modal-row"><span class="modal-label">Cliente</span><span id="modal-customer"></span></div>
+        <div class="modal-row"><span class="modal-label">Mascota</span><span id="modal-pet"></span></div>
+        <div class="modal-row"><span class="modal-label">Tipo</span><span id="modal-type"></span></div>
+        <div class="modal-row"><span class="modal-label">Notas</span><span id="modal-notes"></span></div>
 
         <div class="modal-footer">
-            <a id="modal-edit" class="modal-btn modal-btn-edit">Editar</a>
-            <button id="modal-delete-btn" class="modal-btn modal-btn-delete">Eliminar</button>
-            <button id="modal-close-2" class="modal-btn modal-btn-close">Cerrar</button>
+            <a id="modal-edit" class="cal-btn cal-btn-primary">Editar cita</a>
+            <button onclick="closeModal()" class="cal-btn">Cerrar</button>
         </div>
 
     </div>
 </div>
-
-
-
-{{-- ====================================================
-     MODAL — ELIMINACIÓN GLOBAL (UNIFICADO)
-==================================================== --}}
-<div id="modal-delete" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden justify-center items-center z-50">
-
-    <div class="bg-gray-800 text-white p-6 rounded-xl shadow-xl w-full max-w-md">
-
-        <h2 class="text-xl font-bold mb-4">Confirmar eliminación</h2>
-        <p class="text-gray-300 mb-6">¿Seguro que deseas eliminar esta cita?</p>
-
-        <div class="flex justify-end gap-3">
-
-            <button onclick="closeDeleteModal()"
-                    class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg">
-                Cancelar
-            </button>
-
-            <button onclick="confirmDelete()"
-                    class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
-                Eliminar
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
-    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(
+        document.getElementById('calendar'), {
+            locale:'es',
+            firstDay:1,
+            initialView:'timeGridWeek',
+            nowIndicator:true,
+            height:'auto',
+            slotMinTime:'08:00:00',
+            slotMaxTime:'21:00:00',
+            events:"{{ route('tenant.appointments.calendar.events') }}",
 
-    const fmt = new Intl.DateTimeFormat("es-ES", {
-        year: "numeric", month: "2-digit", day: "2-digit",
-        hour: "2-digit", minute: "2-digit"
-    });
+            eventDidMount(info) {
+                const EP = info.event.extendedProps;
 
-    /* ============================================
-       FULLCALENDAR
-    ============================================ */
-    const calendar = new FullCalendar.Calendar(calendarEl, {
+                if (EP.type) {
+                    info.el.classList.add(EP.type);
+                    info.el.dataset.type = EP.type;
+                }
 
-        initialView: 'timeGridDay',
-        firstDay: 1,
-        locale: 'es',
-        navLinks: true,
-        height: 700,
-        contentHeight: "auto",
-        stickyHeaderDates: false,
-        nowIndicator: true,
-        dayMaxEvents: true,
-        eventDisplay: 'block',
-        slotMinTime: "08:00:00",
-        slotMaxTime: "21:00:00",
+                if (EP.is_difficult) {
+                    info.el.classList.add('dificiles');
+                }
 
-        slotLabelFormat: {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-},
+                if (info.event.end) {
+                    const duration = (info.event.end - info.event.start) / 60000;
+                    if (duration < 30) {
+                        info.el.classList.add('fc-timegrid-event-short');
+                    }
+                }
+            },
 
-
-
-        events: "{{ route('tenant.appointments.calendar.events') }}",
-
-        eventDidMount(info) {
-            info.el.classList.remove('muda','corte','arreglo','gato','cancelled','dificiles');
-            const tipo = info.event.extendedProps.type;
-            if (tipo) info.el.classList.add(tipo);
-            info.el.setAttribute("data-event-type", tipo);
-        },
-
-        eventClick(info) {
-            openModal(info.event);
+            eventClick(info) {
+                openModal(info.event);
+            }
         }
-
-    });
+    );
 
     calendar.render();
 
+    document.getElementById('btn-day').onclick = () => calendar.changeView('timeGridDay');
+    document.getElementById('btn-week').onclick = () => calendar.changeView('timeGridWeek');
+    document.getElementById('btn-month').onclick = () => calendar.changeView('dayGridMonth');
 
-    /* ============================================
-       FILTROS
-    ============================================ */
-    function applyFilter() {
-        const activos = Array.from(
-            document.querySelectorAll('.legend input[type="checkbox"]')
-        )
-        .filter(ch => ch.checked)
-        .map(ch => ch.dataset.type);
+    function applyFilters() {
+        const active = [...document.querySelectorAll('[data-type]:checked')]
+            .map(c => c.dataset.type);
 
         document.querySelectorAll('.fc-event').forEach(ev => {
-            const tipo = ev.getAttribute("data-event-type");
-            ev.style.display = activos.includes(tipo) ? '' : 'none';
+            ev.style.display = active.includes(ev.dataset.type) ? '' : 'none';
         });
     }
 
-    document.querySelectorAll('.legend input').forEach(ch => {
-        ch.addEventListener('change', applyFilter);
-    });
+    document.querySelectorAll('[data-type]')
+        .forEach(c => c.addEventListener('change', applyFilters));
 
-    calendar.on('eventsSet', applyFilter);
+    calendar.on('eventsSet', applyFilters);
 
-
-    /* ============================================
-       VISTAS
-    ============================================ */
-    document.getElementById('btn-today').onclick = () => calendar.today();
-    document.getElementById('btn-month').onclick = () => calendar.changeView('dayGridMonth');
-    document.getElementById('btn-week').onclick = () => calendar.changeView('timeGridWeek');
-
-
-    /* ============================================
-       MODAL DETALLES
-    ============================================ */
-    const modal = document.getElementById('modal');
-
-    function openModal(event) {
-
-        modal.style.display = "flex";
+    window.openModal = function(event) {
+        document.getElementById('modal').style.display = 'flex';
 
         const EP = event.extendedProps;
 
         document.getElementById('modal-title').textContent = event.title;
-        document.getElementById('modal-customer').textContent = EP.customer ?? '-';
-        document.getElementById('modal-pet').textContent = EP.pet ?? '-';
-        document.getElementById('modal-type').textContent = EP.type ?? '-';
-        document.getElementById('modal-notes').textContent = EP.notes ?? '-';
+        document.getElementById('modal-time').textContent =
+            event.start.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) +
+            (event.end ? ' – ' + event.end.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '');
 
-        const s = fmt.format(event.start);
-        const e = event.end ? fmt.format(event.end) : '';
-        document.getElementById('modal-time').textContent = e ? `${s} → ${e}` : s;
+        document.getElementById('modal-customer').textContent = EP.customer ?? '—';
+        document.getElementById('modal-pet').textContent = EP.pet ?? '—';
+        document.getElementById('modal-type').textContent = EP.type ?? '—';
+        document.getElementById('modal-notes').textContent = EP.notes ?? '—';
 
         document.getElementById('modal-edit').href =
             `/tenant/appointments/${event.id}/edit`;
-
-        document.getElementById('modal-delete-btn').onclick = () => {
-            closeModal();
-            openDeleteModalFromCalendar(event.id);
-        };
-    }
-
-    function closeModal() {
-        modal.style.display = "none";
-    }
-
-    document.getElementById('modal-close').onclick = closeModal;
-    document.getElementById('modal-close-2').onclick = closeModal;
-
-    modal.onclick = e => {
-        if (e.target === modal) closeModal();
     };
 
-
-    /* ============================================
-       MODAL ELIMINACIÓN GLOBAL
-    ============================================ */
-    let deleteEventId = null;
-
-    window.openDeleteModalFromCalendar = function(id) {
-        deleteEventId = id;
-        const md = document.getElementById("modal-delete");
-        md.classList.remove("hidden");
-        md.classList.add("flex");
+    window.closeModal = function() {
+        document.getElementById('modal').style.display = 'none';
     };
-
-    window.closeDeleteModal = function() {
-        const md = document.getElementById("modal-delete");
-        md.classList.add("hidden");
-        md.classList.remove("flex");
-    };
-
-    window.confirmDelete = function() {
-
-        fetch(`/tenant/appointments/${deleteEventId}`, {
-            method: "DELETE",
-            headers: { "X-CSRF-TOKEN": csrf }
-        })
-        .then(() => {
-            closeDeleteModal();
-            calendar.refetchEvents();
-        });
-    };
-
 });
 </script>
 

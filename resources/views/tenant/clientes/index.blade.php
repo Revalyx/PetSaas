@@ -14,6 +14,37 @@
             'telefono' => $c->telefono,
             'email' => $c->email,
         ])),
+        totalCount: 0,
+        shownCount: 0,
+        init() {
+            this.totalCount = this.clients.length
+            this.shownCount = this.clients.length
+
+            this.$watch('filtered.length', value => {
+                this.animateCount(this.shownCount, value, val => {
+                    this.shownCount = val
+                })
+            })
+        },
+        animateCount(from, to, callback) {
+            const duration = 250
+            const start = performance.now()
+
+            const step = now => {
+                const progress = Math.min((now - start) / duration, 1)
+                const value = Math.round(from + (to - from) * progress)
+                callback(value)
+
+                if (progress < 1) {
+                    requestAnimationFrame(step)
+                }
+            }
+
+            requestAnimationFrame(step)
+        },
+
+
+
         get filtered() {
             if (this.search === '') return this.clients
 
@@ -74,11 +105,30 @@
     </div>
 
     <!-- CONTADOR -->
-    <div class="text-sm text-slate-500 dark:text-slate-400 mb-4">
-        Mostrando
-        <span class="font-semibold text-slate-700 dark:text-slate-200" x-text="filtered.length"></span>
-        clientes
-    </div>
+<div class="text-sm text-slate-500 dark:text-slate-400 mb-4 transition-all">
+    <template x-if="search === ''">
+        <span>
+            Mostrando
+            <span class="font-semibold text-slate-700 dark:text-slate-200"
+                  x-text="shownCount"></span>
+            clientes
+        </span>
+    </template>
+
+    <template x-if="search !== ''">
+        <span>
+            Mostrando
+            <span class="font-semibold text-slate-700 dark:text-slate-200"
+                  x-text="shownCount"></span>
+            de
+            <span class="font-semibold text-slate-700 dark:text-slate-200"
+                  x-text="totalCount"></span>
+            clientes
+        </span>
+    </template>
+</div>
+
+
 
     <!-- CARD -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 p-6">
