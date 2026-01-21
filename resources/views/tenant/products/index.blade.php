@@ -96,7 +96,7 @@
             @click="view = view === 'grid' ? 'list' : 'grid'; localStorage.setItem('products_view', view)"
             class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800
                    dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 transition shadow-sm">
-            <span x-text="view === 'grid' ? 'Cambiar a Vista Lista' : 'Cambiar a Vista Grid'"></span>
+            <span x-text="view === 'grid' ? 'Cambiar a Vista Lista' : 'Cambiar a Vista Columnas'"></span>
         </button>
 
         <a href="{{ route('tenant.products.create') }}"
@@ -205,19 +205,30 @@
                 </div>
 
                 <div class="flex justify-center gap-3 mt-6">
-                    <button onclick="openStockModal(this.dataset.id, this.dataset.stock, this.dataset.name)"
-                            :data-id="p.id" :data-stock="p.stock" :data-name="p.producto"
-                            class="w-10 h-10 rounded-xl bg-white text-teal-600 border border-slate-200
-                                   hover:bg-teal-600 hover:text-white transition">➕</button>
+                    <button
+                                    onclick="openStockModal(this.dataset.id, this.dataset.stock, this.dataset.name)"
+                                    :data-id="p.id"
+                                    :data-stock="p.stock"
+                                    :data-name="p.producto"
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg
+                                        bg-white text-teal-600 border border-slate-200
+                                        hover:bg-teal-600 hover:text-white transition">
+                                    ➕
+                                </button>
 
-                    <a :href="`/tenant/products/${p.id}/edit`"
-                       class="w-10 h-10 rounded-xl bg-white text-slate-600 border border-slate-200
-                              hover:bg-slate-600 hover:text-white transition">✏️</a>
+                                <a
+                                    :href="`/tenant/products/${p.id}/edit`"
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg
+                                        bg-white text-slate-600 border border-slate-200
+                                        hover:bg-slate-600 hover:text-white transition">
+                                    ✏️
+                                </a>
 
                     <button onclick="openDeleteModal(this.dataset.id, this.dataset.name)"
                             :data-id="p.id" :data-name="p.producto"
-                            class="w-10 h-10 rounded-xl bg-white text-red-600 border border-slate-200
-                                   hover:bg-red-600 hover:text-white transition">🗑️</button>
+                            class="w-8 h-8 flex items-center justify-center rounded-lg
+                                        bg-white text-slate-600 border border-slate-200
+                                        hover:bg-slate-600 hover:text-white transition">🗑️</button>
                 </div>
 
             </div>
@@ -275,14 +286,25 @@
 
                         <td class="px-4 py-3">
                             <div class="flex justify-center gap-2">
-                                <button onclick="openStockModal(this.dataset.id, this.dataset.stock, this.dataset.name)"
-                                        :data-id="p.id" :data-stock="p.stock" :data-name="p.producto"
-                                        class="w-8 h-8 rounded-lg bg-white text-teal-600 border border-slate-200
-                                               hover:bg-teal-600 hover:text-white transition">➕</button>
+                                <button
+                                    onclick="openStockModal(this.dataset.id, this.dataset.stock, this.dataset.name)"
+                                    :data-id="p.id"
+                                    :data-stock="p.stock"
+                                    :data-name="p.producto"
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg
+                                        bg-white text-teal-600 border border-slate-200
+                                        hover:bg-teal-600 hover:text-white transition">
+                                    ➕
+                                </button>
 
-                                <a :href="`/tenant/products/${p.id}/edit`"
-                                   class="w-8 h-8 rounded-lg bg-white text-slate-600 border border-slate-200
-                                          hover:bg-slate-600 hover:text-white transition">✏️</a>
+                                <a
+                                    :href="`/tenant/products/${p.id}/edit`"
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg
+                                        bg-white text-slate-600 border border-slate-200
+                                        hover:bg-slate-600 hover:text-white transition">
+                                    ✏️
+                                </a>
+
 
                                 <button onclick="openDeleteModal(this.dataset.id, this.dataset.name)"
                                         :data-id="p.id" :data-name="p.producto"

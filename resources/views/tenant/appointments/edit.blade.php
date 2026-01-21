@@ -5,11 +5,26 @@
 
 @section('content')
 
+@php
+    $input = '
+        w-full rounded-xl px-4 py-2
+        bg-white text-[#0f172a] border border-[#e5e7eb]
+        dark:bg-[#020617] dark:text-[#e5e7eb] dark:border-[#1e293b]
+        focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/50
+        transition
+    ';
+
+    $label = '
+        block mb-1 font-semibold
+        text-[#0f172a] dark:text-[#e5e7eb]
+    ';
+@endphp
+
 <div class="flex justify-center py-12 px-4">
 
     <div class="w-full max-w-3xl rounded-3xl
                 bg-gradient-to-b from-white to-[#f1f5f9]
-                dark:bg-gradient-to-b dark:from-[#0f172a] dark:to-[#020617]
+                dark:from-[#0f172a] dark:to-[#020617]
                 border border-[#e5e7eb] dark:border-[#1e293b]
                 shadow-2xl p-10 space-y-8">
 
@@ -23,7 +38,7 @@
             </p>
         </div>
 
-        {{-- RESUMEN ACTUAL --}}
+        {{-- RESUMEN --}}
         <div class="rounded-2xl p-5
                     bg-white/80 dark:bg-[#020617]/70
                     border border-[#e5e7eb] dark:border-[#1e293b]
@@ -62,27 +77,11 @@
             @csrf
             @method('PUT')
 
-            @php
-                $inputBase = '
-                    w-full rounded-xl px-4 py-2
-                    bg-white dark:bg-[#020617]
-                    border border-[#e5e7eb] dark:border-[#1e293b]
-                    text-[#0f172a] dark:text-[#e5e7eb]
-                    focus:outline-none
-                    focus:ring-2 focus:ring-[#14b8a6]/50
-                    transition
-                ';
-                $labelBase = '
-                    block mb-1 font-semibold
-                    text-[#0f172a] dark:text-white
-                ';
-            @endphp
-
             <div>
-                <label class="{{ $labelBase }}">Cliente</label>
-                <select name="customer_id" class="{{ $inputBase }}">
+                <label class="{{ $label }}">Cliente</label>
+                <select name="customer_id" class="{{ $input }}">
                     @foreach($customers as $c)
-                        <option value="{{ $c->id }}" {{ $c->id == $appointment->customer_id ? 'selected' : '' }}>
+                        <option value="{{ $c->id }}" @selected($c->id == $appointment->customer_id)>
                             {{ $c->nombre }} {{ $c->apellidos }}
                         </option>
                     @endforeach
@@ -90,11 +89,11 @@
             </div>
 
             <div>
-                <label class="{{ $labelBase }}">Mascota (opcional)</label>
-                <select name="pet_id" class="{{ $inputBase }}">
+                <label class="{{ $label }}">Mascota</label>
+                <select name="pet_id" class="{{ $input }}">
                     <option value="">Sin mascota</option>
                     @foreach($pets as $p)
-                        <option value="{{ $p->id }}" {{ $p->id == $appointment->pet_id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" @selected($p->id == $appointment->pet_id)>
                             {{ $p->nombre }}
                         </option>
                     @endforeach
@@ -102,13 +101,12 @@
             </div>
 
             <div>
-                <label class="{{ $labelBase }}">Tipo de cita</label>
-                <select name="type" class="{{ $inputBase }}">
-                    <option value="muda"     {{ $appointment->type=='muda' ? 'selected' : '' }}>Muda</option>
-                    <option value="corte"    {{ $appointment->type=='corte' ? 'selected' : '' }}>Corte</option>
-                    <option value="arreglo"  {{ $appointment->type=='arreglo' ? 'selected' : '' }}>Arreglo</option>
-                    <option value="gato"     {{ $appointment->type=='gato' ? 'selected' : '' }}>Gato</option>
-                    <option value="cancelar" {{ $appointment->type=='cancelar' ? 'selected' : '' }}>Cancelar</option>
+                <label class="{{ $label }}">Tipo de cita</label>
+                <select name="type" class="{{ $input }}">
+                    <option value="muda"    @selected($appointment->type=='muda')>Muda</option>
+                    <option value="corte"   @selected($appointment->type=='corte')>Corte</option>
+                    <option value="arreglo" @selected($appointment->type=='arreglo')>Arreglo</option>
+                    <option value="gato"    @selected($appointment->type=='gato')>Gato</option>
                 </select>
             </div>
 
@@ -118,49 +116,50 @@
                 <input type="checkbox"
                        name="is_difficult"
                        value="1"
-                       {{ $appointment->is_difficult ? 'checked' : '' }}
-                       class="w-4 h-4 rounded border-[#14b8a6] text-[#14b8a6] focus:ring-[#14b8a6]">
-                <span class="text-sm text-[#0f172a] dark:text-[#e5e7eb] font-medium">
+                       @checked($appointment->is_difficult)
+                       class="w-4 h-4 rounded border-[#14b8a6]
+                              text-[#14b8a6] focus:ring-[#14b8a6]">
+                <span class="text-sm font-medium text-[#0f172a] dark:text-[#e5e7eb]">
                     Marcar como cita difícil
                 </span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="{{ $labelBase }}">Fecha</label>
+                    <label class="{{ $label }}">Fecha</label>
                     <input type="date" name="date"
                            value="{{ $appointment->date->format('Y-m-d') }}"
-                           class="{{ $inputBase }}">
+                           class="{{ $input }}">
                 </div>
 
                 <div>
-                    <label class="{{ $labelBase }}">Hora inicio</label>
+                    <label class="{{ $label }}">Hora inicio</label>
                     <input type="time" name="start_time"
                            value="{{ $appointment->start_time }}"
-                           class="{{ $inputBase }}">
+                           class="{{ $input }}">
                 </div>
 
                 <div>
-                    <label class="{{ $labelBase }}">Hora fin</label>
+                    <label class="{{ $label }}">Hora fin</label>
                     <input type="time" name="end_time"
                            value="{{ $appointment->end_time }}"
-                           class="{{ $inputBase }}">
+                           class="{{ $input }}">
                 </div>
             </div>
 
             <div>
-                <label class="{{ $labelBase }}">Estado</label>
-                <select name="status" class="{{ $inputBase }}">
-                    <option value="pending"   {{ $appointment->status=='pending' ? 'selected' : '' }}>Pendiente</option>
-                    <option value="confirmed" {{ $appointment->status=='confirmed' ? 'selected' : '' }}>Confirmada</option>
-                    <option value="cancelled" {{ $appointment->status=='cancelled' ? 'selected' : '' }}>Cancelada</option>
-                    <option value="completed" {{ $appointment->status=='completed' ? 'selected' : '' }}>Completada</option>
+                <label class="{{ $label }}">Estado</label>
+                <select name="status" class="{{ $input }}">
+                    <option value="pending"   @selected($appointment->status=='pending')>Pendiente</option>
+                    <option value="confirmed" @selected($appointment->status=='confirmed')>Confirmada</option>
+                    <option value="cancelled" @selected($appointment->status=='cancelled')>Cancelada</option>
+                    <option value="completed" @selected($appointment->status=='completed')>Completada</option>
                 </select>
             </div>
 
             <div>
-                <label class="{{ $labelBase }}">Notas</label>
-                <textarea name="notes" rows="3" class="{{ $inputBase }}">{{ $appointment->notes }}</textarea>
+                <label class="{{ $label }}">Notas</label>
+                <textarea name="notes" rows="3" class="{{ $input }}">{{ $appointment->notes }}</textarea>
             </div>
 
             {{-- ACCIONES --}}
@@ -168,15 +167,17 @@
                 <a href="{{ route('tenant.appointments.index') }}"
                    class="px-4 py-2 rounded-xl
                           bg-[#e5e7eb] dark:bg-[#1e293b]
-                          text-[#0f172a] dark:text-[#e5e7eb]">
+                          text-[#0f172a] dark:text-[#e5e7eb]
+                          hover:brightness-95 transition">
                     Cancelar
                 </a>
 
-                <button class="px-6 py-2 rounded-xl
+                <button type="submit"
+                        class="px-6 py-2 rounded-xl
                                bg-gradient-to-r from-[#14b8a6] to-[#0d9488]
                                hover:brightness-110
                                text-[#0f172a]
-                               font-semibold shadow-lg">
+                               font-semibold shadow-lg transition">
                     Guardar cambios
                 </button>
             </div>

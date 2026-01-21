@@ -54,50 +54,47 @@ class SuperAdminController extends Controller
      *  GUARDAR NUEVO TENANT
      * ====================================================
      */
-    public function storeTenant(Request $request)
+public function storeTenant(Request $request)
 {
-    $request->validate([
-        'empresa' => 'required|string|max:255',
-        'slug'    => 'required|string|max:255|unique:tenants,slug',
+    $validated = $request->validate([
+        'empresa' => ['required', 'string', 'max:255'],
+        'slug'    => ['required', 'string', 'max:255', 'unique:tenants,slug'],
+    ], [
+        'slug.unique' => 'Este identificador ya está en uso.',
     ]);
 
-    $slug   = $request->slug;
+    $slug   = $validated['slug'];
     $dbName = $slug;
 
-    // 1️⃣ Crear base de datos del tenant
-    DB::statement("CREATE DATABASE `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    // 1) Infraestructura
+    DB::connection('mysql_admin')->statement(
+        "CREATE DATABASE IF NOT EXISTS `$dbName`
+         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+    );
 
-    // 2️⃣ Registrar tenant
+    DB::connection('mysql_admin')->statement(
+        "GRANT ALL PRIVILEGES ON `$dbName`.* TO 'petsaas_app'@'localhost'"
+    );
+    DB::connection('mysql_admin')->statement("FLUSH PRIVILEGES");
+
+    // 2) Registro lógico (FUENTE DE VERDAD)
     $tenant = Tenant::create([
-        'name'        => $request->empresa,
+        'name'        => $validated['empresa'],
         'slug'        => $slug,
+        'db_host'     => '127.0.0.1',
         'db_name'     => $dbName,
-        'db_host'     => env('DB_HOST'),
         'db_username' => env('DB_USERNAME'),
         'db_password' => encrypt(env('DB_PASSWORD')),
+        'is_active'   => 1,
     ]);
 
-    // 3️⃣ Conectar al tenant
-    config([
-        'database.connections.tenant.host'     => $tenant->db_host,
-        'database.connections.tenant.database' => $tenant->db_name,
-        'database.connections.tenant.username' => $tenant->db_username,
-        'database.connections.tenant.password' => decrypt($tenant->db_password),
-    ]);
+    // 3) Lanzar migraciones en background
+    dispatch(new \App\Jobs\RunTenantMigrations($tenant));
 
-    DB::purge('tenant');
-
-    // 4️⃣ Migraciones del tenant (YA SIN users)
-    \Artisan::call('migrate', [
-    '--database' => 'tenant',
-    '--path'     => 'database/migrations/tenant',
-    '--force'    => true,
-]);
-
-    return redirect()->route('superadmin.dashboard')
-        ->with('success', 'Empresa creada con éxito.');
+    return redirect()
+        ->route('superadmin.dashboard')
+        ->with('success', 'Empresa creada. Inicializando base de datos…');
 }
-
 
 
 
@@ -106,30 +103,35 @@ class SuperAdminController extends Controller
      *  ELIMINAR TENANT (BD + USUARIOS + REGISTRO)
      * ====================================================
      */
-    public function destroy($id)
-    {
-        $tenant = Tenant::findOrFail($id);
-        $dbName = $tenant->db_name;
+public function destroy($id)
+{
+    $tenant = Tenant::findOrFail($id);
+    $dbName = $tenant->db_name;
 
-        try {
-            // 1️⃣ Borrar base de datos física
-            DB::statement("DROP DATABASE IF EXISTS `$dbName`");
+    try {
+        // 1️⃣ Borrar base de datos física (CON ADMIN)
+        DB::connection('mysql_admin')->statement(
+            "DROP DATABASE IF EXISTS `$dbName`"
+        );
 
-            // 2️⃣ Borrar usuarios asociados
-            User::where('tenant_id', $tenant->id)->delete();
+        // 2️⃣ Borrar usuarios asociados (si los hubiera)
+        User::where('tenant_id', $tenant->id)->delete();
 
-            // 3️⃣ Borrar registro del tenant
-            $tenant->delete();
+        // 3️⃣ Borrar registro del tenant
+        $tenant->delete();
 
-            return redirect()->route('superadmin.dashboard')
-                ->with('success', 'La empresa y su base de datos han sido eliminadas correctamente.');
+        return redirect()
+            ->route('superadmin.dashboard')
+            ->with('success', 'La empresa y su base de datos han sido eliminadas correctamente.');
 
-        } catch (\Exception $e) {
+    } catch (\Throwable $e) {
 
-            return redirect()->route('superadmin.dashboard')
-                ->with('error', 'Error al eliminar empresa: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('superadmin.dashboard')
+            ->with('error', 'Error al eliminar empresa: ' . $e->getMessage());
     }
+}
+
 
 
     /**

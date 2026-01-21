@@ -7,26 +7,17 @@
      x-data="{
         pricingMode: 'auto',
 
-        // =========================
-        // VALORES INICIALES
-        // =========================
         precio_real: {{ old('precio_real', $product->precio_real ?? $product->precio) }},
         impuesto: {{ old('porcentaje_impuesto', $product->porcentaje_impuesto ?? 21) }},
         margen: {{ old('margen', $product->margen ?? 0) }},
         pvp_manual: {{ old('pvp', $product->pvp) }},
 
-        // =========================
-        // SEGURIDAD DE MARGEN
-        // =========================
         get margenSeguro() {
             if (this.margen < 0) return 0
             if (this.margen > 95) return 95
             return this.margen
         },
 
-        // =========================
-        // LÓGICA DE PRECIOS REAL
-        // =========================
         get precioSinIva() {
             const coste = Number(this.precio_real || 0)
             const m = Number(this.margenSeguro) / 100
@@ -51,7 +42,6 @@
         Editar producto
     </h1>
 
-    {{-- ERRORES --}}
     @if ($errors->any())
         <div class="mb-6 rounded-xl border border-red-500/40
                     bg-red-100 dark:bg-red-900/30
@@ -76,12 +66,20 @@
             @csrf
             @method('PUT')
 
+            {{-- INPUT BASE --}}
+            @php
+                $input = 'w-full rounded-xl border px-3 py-2
+                          bg-white text-slate-900 border-slate-300
+                          dark:bg-slate-900 dark:text-slate-100 dark:border-slate-600
+                          focus:ring-2 focus:ring-teal-500 focus:outline-none';
+            @endphp
+
             {{-- ID ADICIONAL --}}
             <div>
                 <label class="block text-sm font-medium mb-1">ID adicional</label>
                 <input type="text" name="id_adicional"
                        value="{{ old('id_adicional', $product->id_adicional) }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
                 <p class="text-xs text-slate-500 mt-1">
                     Referencia interna opcional (SKU, código propio, etc.).
                 </p>
@@ -91,10 +89,9 @@
             <div>
                 <label class="block text-sm font-medium mb-1">Código de barras</label>
                 <input type="text" name="codigo_barras"
-                       maxlength="50"
-                       inputmode="numeric"
+                       maxlength="50" inputmode="numeric"
                        value="{{ old('codigo_barras', $product->codigo_barras) }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
                 <p class="text-xs text-slate-500 mt-1">
                     Solo números. Máximo 50 caracteres.
                 </p>
@@ -105,7 +102,7 @@
                 <label class="block text-sm font-medium mb-1">Nombre del producto</label>
                 <input type="text" name="producto" required
                        value="{{ old('producto', $product->producto) }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
             {{-- CATEGORÍA --}}
@@ -113,7 +110,7 @@
                 <label class="block text-sm font-medium mb-1">Categoría</label>
                 <input type="text" name="categoria"
                        value="{{ old('categoria', $product->categoria) }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
             {{-- PRECIO REAL --}}
@@ -123,7 +120,7 @@
                 </label>
                 <input type="number" step="0.01" min="0" name="precio_real" required
                        x-model.number="precio_real"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
                 <p class="text-xs text-slate-500 mt-1">
                     Coste real del producto sin IVA.
                 </p>
@@ -132,13 +129,14 @@
             {{-- IVA --}}
             <div>
                 <label class="block text-sm font-medium mb-1">% IVA</label>
-                <input type="number" step="0.01" min="0" name="porcentaje_impuesto" required
+                <input type="number" step="0.01" min="0"
+                       name="porcentaje_impuesto"
                        x-model.number="impuesto"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
             {{-- MODO PRECIO --}}
-            <div class="rounded-xl border p-4 space-y-3">
+            <div class="rounded-xl border border-slate-300 dark:border-slate-600 p-4 space-y-3">
                 <div class="text-sm font-semibold">
                     ¿Cómo desea fijar el precio?
                 </div>
@@ -162,13 +160,9 @@
                 <input type="number" step="0.01" min="0" max="95"
                        name="margen"
                        x-model.number="margen"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
 
-                <p x-show="margen > 95" class="text-xs text-red-600 mt-1">
-                    El margen máximo permitido es 95%.
-                </p>
-
-                <div class="mt-2 text-xs text-slate-600 space-y-1">
+                <div class="mt-2 text-xs text-slate-600 dark:text-slate-300 space-y-1">
                     <div>Beneficio: <strong x-text="beneficioCalculado + ' €'"></strong></div>
                     <div>IVA: <strong x-text="ivaCalculado + ' €'"></strong></div>
                     <div>PVP final: <strong x-text="pvpCalculado + ' €'"></strong></div>
@@ -181,7 +175,7 @@
                 <input type="number" step="0.01" min="0"
                        name="pvp"
                        x-model.number="pvp_manual"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
             {{-- STOCK --}}
@@ -189,7 +183,7 @@
                 <label class="block text-sm font-medium mb-1">Stock</label>
                 <input type="number" min="0" name="stock" required
                        value="{{ old('stock', $product->stock) }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
             {{-- IMAGEN ACTUAL --}}
@@ -205,7 +199,7 @@
             <div>
                 <label class="block text-sm font-medium mb-1">Cambiar imagen</label>
                 <input type="file" name="image" accept="image/*"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
             {{-- ALT SEO --}}
@@ -213,10 +207,10 @@
                 <label class="block text-sm font-medium mb-1">Texto alternativo (SEO)</label>
                 <input type="text" name="image_alt"
                        value="{{ old('image_alt', $product->image_alt) }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="{{ $input }}">
             </div>
 
-            {{-- INPUTS OCULTOS (FUENTE DE VERDAD PARA BACKEND) --}}
+            {{-- INPUTS OCULTOS --}}
             <input type="hidden" name="precio"
                    :value="pricingMode === 'auto'
                             ? precioSinIva.toFixed(2)

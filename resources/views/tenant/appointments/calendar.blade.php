@@ -125,6 +125,12 @@
 /* =====================================================
    FULLCALENDAR – INTEGRACIÓN ARIS
 ===================================================== */
+.fc-col-header{
+    color: #FCFCFC;
+}
+.fc-scrollgrid-sync-inner{
+    background: #0C1325;
+}
 .fc-toolbar { display:none; }
 
 .fc {
@@ -400,8 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const EP = info.event.extendedProps;
 
                 if (EP.type) {
-                    info.el.classList.add(EP.type);
-                    info.el.dataset.type = EP.type;
+                    const type = EP.type.toLowerCase();
+                    info.el.classList.add(type);
+                    info.el.dataset.type = type;
                 }
 
                 if (EP.is_difficult) {
