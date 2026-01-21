@@ -3,21 +3,72 @@
 @section('title', 'Añadir producto')
 
 @section('content')
+
+<style>
+/* ===========================
+   VARIABLES ARIS
+=========================== */
+:root {
+    --aris-bg-light: #f8fafc;
+    --aris-bg-dark: #020617;
+    --aris-bg-dark-2: #0f172a;
+
+    --aris-primary: #14b8a6;
+    --aris-primary-hover: #0d9488;
+
+    --aris-border-light: #cbd5f5;
+    --aris-border-dark: #1e293b;
+
+    --aris-text-light: #020617;
+    --aris-text-dark: #e5e7eb;
+
+    --aris-muted-light: #475569;
+    --aris-muted-dark: #94a3b8;
+}
+
+/* ===========================
+   INPUTS ARIS
+=========================== */
+.aris-input {
+    background-color: white;
+    color: var(--aris-text-light);
+    border: 1px solid var(--aris-border-light);
+}
+
+.dark .aris-input {
+    background-color: var(--aris-bg-dark-2);
+    color: var(--aris-text-dark);
+    border-color: var(--aris-border-dark);
+}
+
+.aris-input::placeholder {
+    color: var(--aris-muted-light);
+}
+
+.dark .aris-input::placeholder {
+    color: var(--aris-muted-dark);
+}
+
+.aris-input:focus {
+    outline: none;
+    border-color: var(--aris-primary);
+    box-shadow: 0 0 0 2px rgba(20,184,166,.35);
+}
+
+/* RADIO */
+.aris-radio {
+    accent-color: var(--aris-primary);
+}
+</style>
+
 <div class="container mx-auto py-10 max-w-2xl"
      x-data="{
-        pricingMode: 'auto', // auto | manual
+        pricingMode: 'auto',
 
-        // PRECIOS (fuente de verdad)
         precio_real: {{ old('precio_real', 0) ?: 0 }},
         impuesto: {{ old('porcentaje_impuesto', 21) ?: 0 }},
         margen: {{ old('margen', 0) ?: 0 }},
         pvp_manual: {{ old('pvp', 0) ?: 0 }},
-
-        // ===== LÓGICA CORRECTA (MARGEN REAL) =====
-        // precio_sin_iva = precio_real / (1 - margen/100)
-        // beneficio = precio_sin_iva - precio_real
-        // iva = precio_sin_iva * (impuesto/100)
-        // pvp = precio_sin_iva + iva
 
         get margenSeguro() {
             if (this.margen < 0) return 0
@@ -81,10 +132,7 @@
                 <label class="block text-sm font-medium mb-1">ID adicional</label>
                 <input type="text" name="id_adicional"
                        value="{{ old('id_adicional') }}"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Referencia interna opcional (SKU, código propio, etc.).
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- CÓDIGO DE BARRAS --}}
@@ -94,10 +142,7 @@
                        value="{{ old('codigo_barras') }}"
                        maxlength="50"
                        inputmode="numeric"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Solo números. Máximo 50 caracteres.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- PRODUCTO --}}
@@ -105,10 +150,7 @@
                 <label class="block text-sm font-medium mb-1">Nombre del producto</label>
                 <input type="text" name="producto" required
                        value="{{ old('producto') }}"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Nombre visible para clientes y facturación.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- CATEGORÍA --}}
@@ -116,10 +158,7 @@
                 <label class="block text-sm font-medium mb-1">Categoría</label>
                 <input type="text" name="categoria"
                        value="{{ old('categoria') }}"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Ayuda a filtrar y organizar el inventario.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- PRECIO REAL --}}
@@ -129,10 +168,7 @@
                 </label>
                 <input type="number" step="0.01" min="0" name="precio_real" required
                        x-model.number="precio_real"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Coste real del producto sin IVA.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- IMPUESTO --}}
@@ -140,10 +176,7 @@
                 <label class="block text-sm font-medium mb-1">% Impuesto (IVA)</label>
                 <input type="number" step="0.01" min="0" name="porcentaje_impuesto" required
                        x-model.number="impuesto"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    IVA aplicado al precio de venta.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- MODO PRECIO --}}
@@ -153,12 +186,12 @@
                 </div>
 
                 <label class="flex items-center gap-2 text-sm">
-                    <input type="radio" value="auto" x-model="pricingMode">
+                    <input type="radio" value="auto" x-model="pricingMode" class="aris-radio">
                     Calcular automáticamente con margen
                 </label>
 
                 <label class="flex items-center gap-2 text-sm">
-                    <input type="radio" value="manual" x-model="pricingMode">
+                    <input type="radio" value="manual" x-model="pricingMode" class="aris-radio">
                     Introducir PVP manualmente
                 </label>
             </div>
@@ -166,7 +199,7 @@
             {{-- MARGEN --}}
             <div x-show="pricingMode === 'auto'">
                 <label class="block text-sm font-medium mb-1">
-                    Margen (%) <span class="text-xs text-slate-500">(máx. 95%)</span>
+                    Margen (%)
                 </label>
                 <input type="number"
                        step="0.01"
@@ -174,12 +207,9 @@
                        max="95"
                        name="margen"
                        x-model.number="margen"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p x-show="margen > 95" class="text-xs text-red-600 mt-1">
-                    El margen máximo permitido es 95% para evitar precios inválidos.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
 
-                <div class="mt-2 text-xs text-slate-600 space-y-1">
+                <div class="mt-2 text-xs text-slate-600 dark:text-slate-400 space-y-1">
                     <div>Beneficio: <strong x-text="beneficioCalculado + ' €'"></strong></div>
                     <div>IVA: <strong x-text="ivaCalculado + ' €'"></strong></div>
                     <div>PVP final: <strong x-text="pvpCalculado + ' €'"></strong></div>
@@ -191,10 +221,7 @@
                 <label class="block text-sm font-medium mb-1">PVP (€)</label>
                 <input type="number" step="0.01" min="0" name="pvp"
                        x-model.number="pvp_manual"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Precio final al cliente con IVA incluido.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- STOCK --}}
@@ -202,10 +229,7 @@
                 <label class="block text-sm font-medium mb-1">Stock inicial</label>
                 <input type="number" min="0" name="stock" required
                        value="{{ old('stock') }}"
-                       class="w-full rounded-xl border px-3 py-2">
-                <p class="text-xs text-slate-500 mt-1">
-                    Unidades disponibles al crear el producto.
-                </p>
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
             {{-- IMAGEN --}}
@@ -213,33 +237,20 @@
                 <label class="block text-sm font-medium mb-2">Imagen del producto</label>
                 <input type="file" name="image" accept="image/*"
                        onchange="previewImage(event)"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="w-full rounded-xl px-3 py-2 aris-input">
                 <img id="preview"
                      class="w-40 h-40 mt-3 object-cover rounded-xl border hidden">
             </div>
 
             {{-- ALT SEO --}}
-            <div class="relative">
-                <label class="block text-sm font-medium mb-1 flex items-center gap-2">
-                    Texto alternativo (SEO)
-                    <span class="relative group cursor-pointer text-slate-400">
-                        ℹ️
-                        <span class="absolute left-1/2 -translate-x-1/2 mt-2
-                                     hidden group-hover:block
-                                     bg-slate-800 text-white text-xs
-                                     rounded-lg px-3 py-2 w-64 z-10">
-                            Describe la imagen para buscadores y accesibilidad.
-                            <br><br>
-                            Ejemplo: <em>Pelota roja de goma para perros pequeños</em>
-                        </span>
-                    </span>
-                </label>
+            <div>
+                <label class="block text-sm font-medium mb-1">Texto alternativo (SEO)</label>
                 <input type="text" name="image_alt"
                        value="{{ old('image_alt') }}"
-                       class="w-full rounded-xl border px-3 py-2">
+                       class="w-full rounded-xl px-3 py-2 aris-input">
             </div>
 
-            {{-- INPUTS OCULTOS PARA BACKEND --}}
+            {{-- INPUTS OCULTOS --}}
             <input type="hidden" name="precio"
                    :value="pricingMode === 'auto'
                             ? precioSinIva.toFixed(2)
@@ -255,7 +266,8 @@
 
             <button type="submit"
                     class="w-full py-3 rounded-xl
-                           bg-teal-600 hover:bg-teal-700
+                           bg-[var(--aris-primary)]
+                           hover:bg-[var(--aris-primary-hover)]
                            text-white font-semibold transition shadow">
                 Guardar producto
             </button>
@@ -270,4 +282,5 @@ function previewImage(event) {
     img.classList.remove('hidden');
 }
 </script>
+
 @endsection
